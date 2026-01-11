@@ -13,3 +13,4 @@ pdfplumber
 tiktoken
 python-multipart
 python-dotenv
+python-jose[cryptography]
