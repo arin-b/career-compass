@@ -1,13 +1,17 @@
 fastapi
 uvicorn[standard]
+gunicorn
 sqlalchemy
 asyncpg
 greenlet
+pydantic
 pydantic-settings
+email-validator
 pgvector
 langchain
 langchain-community
 langchain-google-genai
+langchain-text-splitters
 pypdf
 pdfplumber
 tiktoken
@@ -15,4 +19,3 @@ python-multipart
 python-dotenv
 python-jose[cryptography]
 bcrypt
-passlib[bcrypt]
