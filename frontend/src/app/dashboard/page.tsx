@@ -26,7 +26,7 @@ const FileUpload = ({ onUploadSuccess }: { onUploadSuccess: (text: string) => vo
 
         try {
             toast.info("Uploading and analyzing transcript...");
-            const res = await fetch("http://localhost:8000/api/v1/upload-transcript", {
+            const res = await fetch("https://career-compass-backend-hf0w.onrender.com/api/v1/upload-transcript", {
                 method: "POST",
                 body: formData,
             });
@@ -275,7 +275,7 @@ const RoadmapTimeline = () => {
             };
             console.log("Request Payload:", payload);
 
-            const res = await fetch("http://localhost:8000/api/v1/roadmaps/generate", {
+            const res = await fetch("https://career-compass-backend-hf0w.onrender.com/api/v1/roadmaps/generate", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
@@ -323,7 +323,7 @@ const RoadmapTimeline = () => {
         try {
             const newStatus = isCompleted ? "Done" : "Pending";
 
-            const res = await fetch(`http://localhost:8000/api/v1/roadmaps/milestones/${milestoneId}`, {
+            const res = await fetch(`https://career-compass-backend-hf0w.onrender.com/api/v1/roadmaps/milestones/${milestoneId}`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ status: newStatus })
@@ -429,7 +429,7 @@ const ChatInterface = () => {
         setLoading(true);
 
         try {
-            const res = await fetch("http://localhost:8000/api/v1/chat", {
+            const res = await fetch("https://career-compass-backend-hf0w.onrender.com/api/v1/chat", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ query: userMsg })

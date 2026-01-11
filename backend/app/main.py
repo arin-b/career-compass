@@ -15,7 +15,7 @@ import os
 
 # ...
 
-origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000").split(",")
+origins = os.getenv("ALLOWED_ORIGINS", "https://career-compass-frontend-6cv7.onrender.com").split(",")
 
 app.add_middleware(
     CORSMiddleware,

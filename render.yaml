@@ -15,7 +15,8 @@ services:
         value: 3.11.9
       - key: SECRET_KEY
         generateValue: true
-      # Removed ALLOWED_ORIGINS to set manually later
+      - key: ALLOWED_ORIGINS
+        value: https://career-compass-frontend-6cv7.onrender.com
 
   # Frontend Service
   - type: web
