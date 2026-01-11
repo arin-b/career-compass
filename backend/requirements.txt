@@ -1,0 +1,15 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+asyncpg
+greenlet
+pydantic-settings
+pgvector
+langchain
+langchain-community
+langchain-google-genai
+pypdf
+pdfplumber
+tiktoken
+python-multipart
+python-dotenv

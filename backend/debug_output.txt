@@ -1,0 +1,134 @@
+{
+  "title": "Software Engineering & Distributed AI Specialist Roadmap",
+  "summary": "This roadmap is designed for a Computer Science student aiming for high-impact roles in Software Engineering, with a strong specialization in Distributed Systems and Artificial Intelligence. The focus is on mastering core algorithms, building scalable systems, and developing a robust portfolio through targeted projects and internships.",
+  "milestones": [
+    {
+      "semester": "Semester 1 (Year 1 Fall)",
+      "title": "Foundational Programming & Exploration",
+      "description": "Establish strong programming fundamentals in a high-level language (Python or Java). Focus on introductory CS concepts and basic data structures.",
+      "status": "Upcoming",
+      "projects": [
+        "Implement basic data structures (Arrays, Linked Lists) from scratch.",
+        "Build a simple command-line utility (e.g., calculator or file organizer)."
+      ],
+      "skills": [
+        "Python or Java Proficiency",
+        "Basic Data Structures",
+        "Git and Version Control",
+        "Introduction to Linux/CLI"
+      ]
+    },
+    {
+      "semester": "Semester 2 (Year 1 Spring)",
+      "title": "Data Structures, Algorithms, and Interview Prep Start",
+      "description": "Master core Data Structures and Algorithms (DSA). Begin practicing competitive programming and technical interview questions (LeetCode Easy/Medium).",
+      "status": "Upcoming",
+      "projects": [
+        "Develop a personal portfolio website.",
+        "Implement advanced DSA (Trees, Heaps, Hash Maps) in C++ or Java."
+      ],
+      "skills": [
+        "Advanced DSA (Trees, Graphs, Sorting)",
+        "Time and Space Complexity Analysis",
+        "C++ or Java Proficiency (for performance)",
+        "Basic Database Concepts (SQL)"
+      ]
+    },
+    {
+      "semester": "Semester 3 (Year 2 Fall)",
+      "title": "Systems Introduction and Software Design",
+      "description": "Take core courses in Operating Systems and Computer Architecture. Begin understanding how software interacts with hardware and networking fundamentals, crucial for Distributed Systems.",
+      "status": "Upcoming",
+      "projects": [
+        "Implement a simple shell or memory allocator.",
+        "Contribute a small feature or fix to an open-source project."
+      ],
+      "skills": [
+        "C/C++ Programming",
+        "Operating Systems Concepts (Processes, Threads)",
+        "Networking Fundamentals (TCP/IP)",
+        "Object-Oriented Design (OOD)"
+      ]
+    },
+    {
+      "semester": "Semester 4 (Year 2 Spring)",
+      "title": "AI/ML Fundamentals and First Internship Acquisition",
+      "description": "Take introductory courses in AI/Machine Learning. Focus heavily on securing a general Software Engineering internship for the summer. Practice full-stack development to broaden appeal.",
+      "status": "Upcoming",
+      "projects": [
+        "Build a basic Machine Learning model (e.g., Linear Regression) using Python libraries (Scikit-learn).",
+        "Develop a simple full-stack application (e.g., using MERN or Django)."
+      ],
+      "skills": [
+        "Introduction to ML/Deep Learning",
+        "Python Libraries (NumPy, Pandas)",
+        "Full-Stack Development Basics",
+        "Advanced Interview Preparation (DSA)"
+      ]
+    },
+    {
+      "semester": "Semester 5 (Year 3 Fall)",
+      "title": "Distributed Systems Deep Dive and Advanced AI",
+      "description": "Begin specialization. Enroll in advanced courses on Distributed Systems (Concurrency, Fault Tolerance) and Deep Learning. Target a specialized internship for the following summer.",
+      "status": "Upcoming",
+      "projects": [
+        "Build a simple distributed key-value store or chat application using sockets/RPC.",
+        "Implement a Convolutional Neural Network (CNN) using PyTorch or TensorFlow."
+      ],
+      "skills": [
+        "Concurrency and Multithreading",
+        "Cloud Computing Basics (AWS/GCP/Azure)",
+        "Advanced Python for AI/ML",
+        "Distributed Computing Frameworks (e.g., Spark basics)"
+      ]
+    },
+    {
+      "semester": "Semester 6 (Year 3 Spring)",
+      "title": "System Design Mastery and Target Internship Acquisition",
+      "description": "Focus on large-scale system design, essential for senior SE and Distributed Systems roles. Secure a high-tier internship (FAANG/Tier 1 tech) in a specialized area (AI Infrastructure or Core DS).",
+      "status": "Upcoming",
+      "projects": [
+        "Design and document a scalable system architecture (e.g., a URL shortener or Twitter feed).",
+        "Participate in a hackathon focused on distributed or AI applications."
+      ],
+      "skills": [
+        "System Design Principles (CAP Theorem, Load Balancing)",
+        "Advanced Distributed Systems Theory (Raft/Paxos)",
+        "API Design (REST, gRPC)",
+        "Advanced Interviewing (Behavioral and System Design)"
+      ]
+    },
+    {
+      "semester": "Semester 7 (Year 4 Fall)",
+      "title": "Capstone Project and Job Search Launch",
+      "description": "Execute a substantial capstone project that integrates Distributed Systems and AI/ML. Focus on full-time job applications and interviews.",
+      "status": "Upcoming",
+      "projects": [
+        "Capstone: Implement a fault-tolerant, distributed message queue or stream processing system.",
+        "Refine and document all portfolio projects for job applications."
+      ],
+      "skills": [
+        "Project Management and Documentation",
+        "CI/CD and Deployment Pipelines (MLOps)",
+        "Advanced Debugging and Performance Tuning",
+        "Professional Communication"
+      ]
+    },
+    {
+      "semester": "Semester 8 (Year 4 Spring)",
+      "title": "Advanced Topics and Career Transition",
+      "description": "Complete remaining academic requirements. Explore niche advanced topics relevant to the first job role (e.g., specialized AI hardware, advanced database internals, or security).",
+      "status": "Upcoming",
+      "projects": [
+        "Write a technical paper or detailed blog post on the capstone project.",
+        "Mentor junior students in DSA or systems concepts."
+      ],
+      "skills": [
+        "Negotiation and Career Planning",
+        "Industry Best Practices (Code Review, Testing)",
+        "Specialized Domain Knowledge (e.g., Cloud Native, Serverless)",
+        "Knowledge Transfer"
+      ]
+    }
+  ]
+}
