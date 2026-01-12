@@ -3,9 +3,9 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { useState, useRef, useEffect, useCallback } from "react"
-import { Send, User, Bot, Sparkles, ChevronLeft, ChevronRight, GraduationCap, Map, BookOpen, Clock, Upload, FileText, CheckCircle } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { Send, User, Bot, Sparkles, ChevronLeft, ChevronRight, GraduationCap, Map, BookOpen, Clock, Upload, FileText, CheckCircle, LogOut } from "lucide-react"
 import { useDropzone } from "react-dropzone"
 import { toast } from "sonner"
 import { motion } from "framer-motion"
@@ -255,6 +255,17 @@ const ProgressBar = ({ completed, total }: { completed: number; total: number })
 const RoadmapTimeline = () => {
     const [steps, setSteps] = useState<any[]>([]);
     const [generating, setGenerating] = useState(false);
+    const router = useRouter();
+
+    const handleLogout = () => {
+        // Remove token from localStorage
+        localStorage.removeItem("access_token");
+        // Also try to remove from cookies just in case
+        document.cookie = "access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT";
+
+        toast.success("Logged out successfully.");
+        router.push("/login");
+    };
 
     const handleGenerate = async (uploadedTranscript: boolean = false) => {
         console.log("Sending request... UploadedTranscript:", uploadedTranscript);
@@ -351,8 +362,8 @@ const RoadmapTimeline = () => {
     const completedCount = steps.filter((step: any) => step.completed).length;
 
     return (
-        <div className="flex-1 p-8 bg-gray-950 text-white overflow-hidden flex flex-col">
-            <div className="flex justify-between items-center mb-6">
+        <div className="flex-1 p-8 bg-gray-950 text-white overflow-hidden flex flex-col h-screen">
+            <div className="flex justify-between items-center mb-6 shrink-0">
                 <div>
                     <h1 className="text-3xl font-bold">Your Roadmap</h1>
                     <p className="text-gray-400">Generated based on your interest in "Software Engineering"</p>
@@ -366,10 +377,18 @@ const RoadmapTimeline = () => {
                         {generating ? <Sparkles className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
                         {generating ? "Generating..." : "Generate with AI"}
                     </Button>
+                    <Button
+                        variant="outline"
+                        onClick={handleLogout}
+                        className="border-red-500/50 text-red-400 hover:bg-red-500/10 hover:text-red-300 gap-2"
+                    >
+                        <LogOut className="w-4 h-4" />
+                        Logout
+                    </Button>
                 </div>
             </div>
 
-            <div className="mb-6 bg-gray-900 border border-gray-800 rounded-lg p-4">
+            <div className="mb-6 bg-gray-900 border border-gray-800 rounded-lg p-4 shrink-0">
                 <h3 className="text-sm font-semibold text-gray-300 mb-2 flex items-center gap-2">
                     <FileText className="w-4 h-4" /> Upload Transcript for Better Results
                 </h3>
@@ -378,7 +397,7 @@ const RoadmapTimeline = () => {
 
             <ProgressBar completed={completedCount} total={steps.length} />
 
-            <ScrollArea className="flex-1 pr-4">
+            <div className="flex-1 overflow-y-auto pr-4">
                 <motion.div
                     className="max-w-2xl"
                     initial="hidden"
@@ -401,7 +420,7 @@ const RoadmapTimeline = () => {
                         />
                     ))}
                 </motion.div>
-            </ScrollArea>
+            </div>
         </div>
     )
 }
