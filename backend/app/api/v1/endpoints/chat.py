@@ -25,4 +25,6 @@ async def upload_transcript(
 async def chat(request: ChatRequest, db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)):
     # RAG: Retrieve context + LLM Response
     result = await query_vector_db(request.query, db)
+    # Debug: Print the LLM response
+    print(f"LLM Response: {result}")
     return result

@@ -26,8 +26,12 @@ const FileUpload = ({ onUploadSuccess }: { onUploadSuccess: (text: string) => vo
 
         try {
             toast.info("Uploading and analyzing transcript...");
+            const token = localStorage.getItem("access_token");
             const res = await fetch("https://career-compass-backend-hf0w.onrender.com/api/v1/upload-transcript", {
                 method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                },
                 body: formData,
             });
 
@@ -286,9 +290,13 @@ const RoadmapTimeline = () => {
             };
             console.log("Request Payload:", payload);
 
+            const token = localStorage.getItem("access_token");
             const res = await fetch("https://career-compass-backend-hf0w.onrender.com/api/v1/roadmaps/generate", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
                 body: JSON.stringify(payload)
             });
 
@@ -334,9 +342,13 @@ const RoadmapTimeline = () => {
         try {
             const newStatus = isCompleted ? "Done" : "Pending";
 
+            const token = localStorage.getItem("access_token");
             const res = await fetch(`https://career-compass-backend-hf0w.onrender.com/api/v1/roadmaps/milestones/${milestoneId}`, {
                 method: "PATCH",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
                 body: JSON.stringify({ status: newStatus })
             });
 
@@ -448,9 +460,13 @@ const ChatInterface = () => {
         setLoading(true);
 
         try {
+            const token = localStorage.getItem("access_token");
             const res = await fetch("https://career-compass-backend-hf0w.onrender.com/api/v1/chat", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
                 body: JSON.stringify({ query: userMsg })
             });
             const data = await res.json();

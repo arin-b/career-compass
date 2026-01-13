@@ -41,7 +41,11 @@ async def generate_roadmap(request: GenerateRoadmapRequest, db: AsyncSession = D
             transcript_text = profile.transcript_summary
             
     if not transcript_text:
-         transcript_text = "Student has generic interest in Computer Science."
+         # Fix: Return 400 instead of generic interest to force user to upload transcript
+         raise HTTPException(
+             status_code=400, 
+             detail="Please upload a transcript first so we can generate a personalized roadmap."
+         )
 
     try:
          # Call AI Engine
