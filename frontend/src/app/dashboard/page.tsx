@@ -9,6 +9,7 @@ import { Send, User, Bot, Sparkles, ChevronLeft, ChevronRight, GraduationCap, Ma
 import { useDropzone } from "react-dropzone"
 import { toast } from "sonner"
 import { motion } from "framer-motion"
+import { fetchClient } from "@/lib/api"
 
 // --- Components ---
 
@@ -26,12 +27,8 @@ const FileUpload = ({ onUploadSuccess }: { onUploadSuccess: (text: string) => vo
 
         try {
             toast.info("Uploading and analyzing transcript...");
-            const token = localStorage.getItem("access_token");
-            const res = await fetch("https://career-compass-backend-hf0w.onrender.com/api/v1/upload-transcript", {
+            const res = await fetchClient("/upload-transcript", {
                 method: "POST",
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                },
                 body: formData,
             });
 
@@ -290,13 +287,8 @@ const RoadmapTimeline = () => {
             };
             console.log("Request Payload:", payload);
 
-            const token = localStorage.getItem("access_token");
-            const res = await fetch("https://career-compass-backend-hf0w.onrender.com/api/v1/roadmaps/generate", {
+            const res = await fetchClient("/roadmaps/generate", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                },
                 body: JSON.stringify(payload)
             });
 
@@ -342,13 +334,8 @@ const RoadmapTimeline = () => {
         try {
             const newStatus = isCompleted ? "Done" : "Pending";
 
-            const token = localStorage.getItem("access_token");
-            const res = await fetch(`https://career-compass-backend-hf0w.onrender.com/api/v1/roadmaps/milestones/${milestoneId}`, {
+            const res = await fetchClient(`/roadmaps/milestones/${milestoneId}`, {
                 method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                },
                 body: JSON.stringify({ status: newStatus })
             });
 
@@ -460,22 +447,17 @@ const ChatInterface = () => {
         setLoading(true);
 
         try {
-            const token = localStorage.getItem("access_token");
-            const res = await fetch("https://career-compass-backend-hf0w.onrender.com/api/v1/chat", {
+            const res = await fetchClient("/chat", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                },
                 body: JSON.stringify({ query: userMsg })
             });
             const data = await res.json();
 
-            // The backend returns { reply: string, context: [] }
+            // The backend returns { response: string, context: [] }
             // Let's format it nicely
             const content = (
                 <div className="space-y-2">
-                    <p>{data.reply}</p>
+                    <p>{data.response}</p>
                     {data.context && data.context.length > 0 && (
                         <div className="text-xs bg-gray-800 p-2 rounded border border-gray-700">
                             <p className="font-bold text-gray-500 mb-1">Sources:</p>

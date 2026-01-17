@@ -19,7 +19,12 @@ async def upload_transcript(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    return await process_transcript(current_user.id, file, db)
+    try:
+        print(f"Receiving upload: {file.filename}, content_type: {file.content_type}")
+        return await process_transcript(current_user.id, file, db)
+    except Exception as e:
+        print(f"Upload failed: {e}")
+        raise
 
 @router.post("/chat")
 async def chat(request: ChatRequest, db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)):
@@ -27,4 +32,9 @@ async def chat(request: ChatRequest, db: AsyncSession = Depends(get_db), current
     result = await query_vector_db(request.query, db)
     # Debug: Print the LLM response
     print(f"LLM Response: {result}")
-    return result
+    
+    # Map 'reply' to 'response' for frontend standardization
+    return {
+        "response": result.get("reply"),
+        "context": result.get("context", [])
+    }
