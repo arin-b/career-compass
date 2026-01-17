@@ -259,10 +259,8 @@ const RoadmapTimeline = () => {
     const router = useRouter();
 
     const handleLogout = () => {
-        // Remove token from localStorage
-        localStorage.removeItem("access_token");
-        // Also try to remove from cookies just in case
-        document.cookie = "access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT";
+        // Remove token from cookie
+        document.cookie = "token=; path=/; max-age=0";
 
         toast.success("Logged out successfully.");
         router.push("/login");
