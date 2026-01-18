@@ -11,7 +11,14 @@ import io
 from langchain_core.messages import HumanMessage, SystemMessage
 
 # Configure Google AI
+import google.generativeai as genai
+
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+
+if not GOOGLE_API_KEY:
+    print("CRITICAL WARNING: GOOGLE_API_KEY is missing from environment variables! AI features will fail.")
+else:
+    genai.configure(api_key=GOOGLE_API_KEY)
 
 def get_embeddings_model():
     if not GOOGLE_API_KEY:
