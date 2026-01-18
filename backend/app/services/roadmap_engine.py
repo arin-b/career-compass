@@ -88,9 +88,10 @@ async def generate_career_roadmap(transcript_text: str, interests: List[str], ma
     }
     """
     
+    context_str = "\n".join(context_parts)
     user_input = f"""
     STUDENT CONTEXT:
-    {"\n".join(context_parts)}
+    {context_str}
     
     Generate the roadmap JSON now.
     """
