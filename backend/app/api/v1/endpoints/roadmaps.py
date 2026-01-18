@@ -33,12 +33,25 @@ async def generate_roadmap(request: GenerateRoadmapRequest, db: AsyncSession = D
         raise HTTPException(status_code=404, detail="User not found")
 
     # Fetch Profile for Transcript if not provided in request
+    # Also fetch manual data
+    manual_data = {}
+    
+    profile_result = await db.execute(select(Profile).where(Profile.id == request.user_id))
+    profile = profile_result.scalar_one_or_none()
+    
     transcript_text = request.transcript_summary
     if not transcript_text or transcript_text == "No transcript provided":
-        profile_result = await db.execute(select(Profile).where(Profile.id == request.user_id))
-        profile = profile_result.scalar_one_or_none()
         if profile and profile.transcript_summary:
             transcript_text = profile.transcript_summary
+            
+    if profile:
+        manual_data = {
+            "manual_gpa": profile.manual_gpa,
+            "manual_major": profile.manual_major,
+            "hobbies": profile.hobbies,
+            "extracurriculars": profile.extracurriculars,
+            "bio": profile.bio
+        }
             
     if not transcript_text:
          # Fix: Return 400 instead of generic interest to force user to upload transcript
@@ -48,8 +61,8 @@ async def generate_roadmap(request: GenerateRoadmapRequest, db: AsyncSession = D
          )
 
     try:
-         # Call AI Engine
-        roadmap_json = await generate_career_roadmap(transcript_text, request.interests)
+         # Call AI Engine with manual data
+        roadmap_json = await generate_career_roadmap(transcript_text, request.interests, manual_data)
         
         # Save to DB
         new_roadmap = Roadmap(

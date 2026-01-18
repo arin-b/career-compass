@@ -23,3 +23,11 @@
 2026-01-09 16:04:37,611 - career_compass - INFO - Creating tables...
 2026-01-09 16:04:48,787 - career_compass - INFO - Tables created successfully.
 2026-01-09 16:04:54,815 - career_compass - INFO - User Alex already exists.
+2026-01-18 12:21:55,368 - career_compass - INFO - Connecting to database to migrate Profile table...
+2026-01-18 12:22:01,241 - career_compass - INFO - Running ALTER TABLE commands for 'profiles'...
+2026-01-18 12:22:01,241 - career_compass - INFO - Executing: ALTER TABLE profiles ADD COLUMN IF NOT EXISTS bio TEXT;
+2026-01-18 12:22:02,162 - career_compass - INFO - Executing: ALTER TABLE profiles ADD COLUMN IF NOT EXISTS hobbies JSONB DEFAULT '[]';
+2026-01-18 12:22:02,776 - career_compass - INFO - Executing: ALTER TABLE profiles ADD COLUMN IF NOT EXISTS extracurriculars JSONB DEFAULT '[]';
+2026-01-18 12:22:03,391 - career_compass - INFO - Executing: ALTER TABLE profiles ADD COLUMN IF NOT EXISTS manual_gpa FLOAT;
+2026-01-18 12:22:04,005 - career_compass - INFO - Executing: ALTER TABLE profiles ADD COLUMN IF NOT EXISTS manual_major VARCHAR;
+2026-01-18 12:22:04,620 - career_compass - INFO - Profile migration completed successfully.

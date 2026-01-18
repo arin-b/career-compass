@@ -48,6 +48,13 @@ class Profile(Base):
     interests = Column(JSONB, default=list)
     transcript_summary = Column(Text, nullable=True)
     skills = Column(JSONB, default=list)
+    
+    # New Fields for Profile Upgrade
+    bio = Column(Text, nullable=True)
+    hobbies = Column(JSONB, default=list)
+    extracurriculars = Column(JSONB, default=list)
+    manual_gpa = Column(Float, nullable=True)
+    manual_major = Column(String, nullable=True)
 
     user = relationship("User", back_populates="profile")
 

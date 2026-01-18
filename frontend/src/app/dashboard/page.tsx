@@ -13,65 +13,21 @@ import { fetchClient } from "@/lib/api"
 
 // --- Components ---
 
-const FileUpload = ({ onUploadSuccess }: { onUploadSuccess: (text: string) => void }) => {
-    const [uploading, setUploading] = useState(false);
-
-    const onDrop = useCallback(async (acceptedFiles: File[]) => {
-        const file = acceptedFiles[0];
-        if (!file) return;
-
-        setUploading(true);
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("user_id", "7dd566d5-5571-40f6-b913-e5e681ea0cb1"); // Hardcoded for demo
-
-        try {
-            toast.info("Uploading and analyzing transcript...");
-            const res = await fetchClient("/upload-transcript", {
-                method: "POST",
-                body: formData,
-            });
-
-            if (!res.ok) throw new Error("Upload failed");
-
-            const data = await res.json();
-            toast.success(`Transcript processed! (${data.transcript_length} chars)`);
-            onUploadSuccess(data.transcript_length > 0 ? "Transcript available" : "");
-
-        } catch (error) {
-            console.error(error);
-            toast.error("Failed to upload transcript");
-        } finally {
-            setUploading(false);
-        }
-    }, [onUploadSuccess]);
-
-    const { getRootProps, getInputProps, isDragActive } = useDropzone({
-        onDrop,
-        accept: { 'application/pdf': ['.pdf'] },
-        maxFiles: 1
-    });
-
-    return (
-        <div {...getRootProps()} className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${isDragActive ? 'border-purple-500 bg-purple-500/10' : 'border-gray-700 hover:border-gray-500'}`}>
-            <input {...getInputProps()} />
-            {uploading ? (
-                <div className="flex flex-col items-center gap-2">
-                    <div className="w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
-                    <p className="text-sm text-gray-400">Analyzing...</p>
-                </div>
-            ) : (
-                <div className="flex flex-col items-center gap-2">
-                    <Upload className="w-8 h-8 text-gray-400" />
-                    <p className="text-sm text-gray-300 font-medium">Click or drag transcript PDF</p>
-                    <p className="text-xs text-gray-500">Supported: PDF (Max 10MB)</p>
-                </div>
-            )}
-        </div>
-    )
-}
+// FileUpload component moved to @/components/file-upload
 
 const Sidebar = () => {
+    const [profile, setProfile] = useState<any>(null);
+
+    useEffect(() => {
+        fetchClient("/users/profile").then(async res => {
+            if (res.ok) setProfile(await res.json());
+        });
+    }, []);
+
+    // Determine display values (Manual > Transcript/Default)
+    const major = profile?.manual_major || "Computer Science (Default)";
+    const gpa = profile?.manual_gpa || "3.8 (Default)";
+
     return (
         <div className="w-64 bg-gray-900 text-white flex flex-col h-full border-r border-gray-800">
             <div className="p-6 border-b border-gray-800 flex items-center gap-2">
@@ -89,7 +45,9 @@ const Sidebar = () => {
                     </div>
                     <div>
                         <h3 className="font-medium text-lg">Alex H.</h3>
-                        <p className="text-xs text-gray-400">Junior Year</p>
+                        <a href="/profile" className="text-xs text-purple-400 hover:text-purple-300 flex items-center gap-1">
+                            Edit Profile <ChevronRight className="w-3 h-3" />
+                        </a>
                     </div>
                 </div>
 
@@ -98,18 +56,18 @@ const Sidebar = () => {
                         <CardContent className="p-4 space-y-2">
                             <div className="flex items-center gap-2 text-sm text-gray-300">
                                 <GraduationCap className="w-4 h-4 text-purple-400" />
-                                <span>Computer Science</span>
+                                <span className="truncate" title={major}>{major}</span>
                             </div>
                             <div className="flex items-center gap-2 text-sm text-gray-300">
                                 <BookOpen className="w-4 h-4 text-blue-400" />
-                                <span>GPA: 3.8</span>
+                                <span>GPA: {gpa}</span>
                             </div>
                         </CardContent>
                     </Card>
                 </div>
             </div>
             <div className="mt-auto p-6 text-xs text-gray-600">
-                v0.1.0 Beta
+                v0.2.0 Beta
             </div>
         </div>
     )
@@ -385,11 +343,14 @@ const RoadmapTimeline = () => {
                 </div>
             </div>
 
-            <div className="mb-6 bg-gray-900 border border-gray-800 rounded-lg p-4 shrink-0">
-                <h3 className="text-sm font-semibold text-gray-300 mb-2 flex items-center gap-2">
-                    <FileText className="w-4 h-4" /> Upload Transcript for Better Results
-                </h3>
-                <FileUpload onUploadSuccess={() => handleGenerate(true)} />
+            <div className="mb-6 p-4 bg-purple-900/20 border border-purple-500/30 rounded-lg flex items-center justify-between">
+                <div>
+                    <h3 className="font-semibold text-purple-200">Want better recommendations?</h3>
+                    <p className="text-sm text-gray-400">Update your profile with new hobbies or transcripts.</p>
+                </div>
+                <Button onClick={() => router.push("/profile")} variant="outline" className="border-purple-500 text-purple-400 hover:bg-purple-500 hover:text-white">
+                    Go to Profile
+                </Button>
             </div>
 
             <ProgressBar completed={completedCount} total={steps.length} />

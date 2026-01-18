@@ -17,18 +17,56 @@ def get_llm():
     # Using a model capable of reliable JSON generation
     return ChatGoogleGenerativeAI(model="gemini-flash-latest", google_api_key=GOOGLE_API_KEY, temperature=0.2)
 
-async def generate_career_roadmap(transcript_text: str, interests: List[str]) -> Dict[str, Any]:
+async def generate_career_roadmap(transcript_text: str, interests: List[str], manual_profile_data: Dict[str, Any] = None) -> Dict[str, Any]:
     """
-    Generates a structured career roadmap based on transcript and interests.
+    Generates a structured career roadmap based on transcript and interests, prioritizing manual profile data.
     """
+    if manual_profile_data is None:
+        manual_profile_data = {}
+
     llm = get_llm()
     
+    # Extract manual overrides
+    manual_gpa = manual_profile_data.get("manual_gpa")
+    manual_major = manual_profile_data.get("manual_major")
+    hobbies = manual_profile_data.get("hobbies", [])
+    extracurriculars = manual_profile_data.get("extracurriculars", [])
+    bio = manual_profile_data.get("bio", "")
+
+    # Construct Context String
+    context_parts = []
+    
+    # 1. Transcript / Academic Context
+    if manual_major or manual_gpa:
+        context_parts.append("MANUAL ACADEMIC DATA (PRIORITY):")
+        if manual_major:
+            context_parts.append(f"- Major: {manual_major}")
+        if manual_gpa:
+            context_parts.append(f"- GPA: {manual_gpa}")
+    
+    context_parts.append("\nTRANSCRIPT SUMMARY (Background):")
+    context_parts.append(transcript_text)
+
+    # 2. Personal Context
+    if bio or hobbies or extracurriculars:
+        context_parts.append("\nPERSONAL PROFILE:")
+        if bio:
+            context_parts.append(f"- Bio: {bio}")
+        if hobbies:
+            context_parts.append(f"- Hobbies: {', '.join(hobbies)}")
+        if extracurriculars:
+            context_parts.append(f"- Extracurriculars: {', '.join(extracurriculars)}")
+
+    # 3. Interests
+    context_parts.append(f"\nINTERESTS:\n{', '.join(interests)}")
+
     system_prompt = """You are an expert Career Counselor AI.
     Your goal is to create a detailed, semester-by-semester career roadmap for a student.
     
-    Input:
-    - Transcript Summary (Text)
-    - Student Interests (List)
+    CRITICAL INSTRUCTION:
+    - Prioritize 'MANUAL ACADEMIC DATA' over valid data found in the 'TRANSCRIPT SUMMARY'.
+    - Use 'PERSONAL PROFILE' (Hobbies, Extracurriculars) to suggest personalized "Pet Projects" or "Club Activities". 
+      For example, if they like Chess + Coding, suggest building a Chess Engine.
     
     Output:
     - Strictly valid JSON format.
@@ -51,11 +89,8 @@ async def generate_career_roadmap(transcript_text: str, interests: List[str]) ->
     """
     
     user_input = f"""
-    TRANSCRIPT SUMMARY:
-    {transcript_text}
-    
-    INTERESTS:
-    {", ".join(interests)}
+    STUDENT CONTEXT:
+    {"\n".join(context_parts)}
     
     Generate the roadmap JSON now.
     """
