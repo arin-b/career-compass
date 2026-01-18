@@ -24,6 +24,8 @@ export default function ProfilePage() {
         bio: "",
         hobbies: [] as string[],
         extracurriculars: [] as string[],
+        display_name: "",
+        avatar_base64: ""
     });
 
     useEffect(() => {
@@ -37,7 +39,9 @@ export default function ProfilePage() {
                         manual_gpa: data.manual_gpa ? data.manual_gpa.toString() : "",
                         bio: data.bio || "",
                         hobbies: data.hobbies || [],
-                        extracurriculars: data.extracurriculars || []
+                        extracurriculars: data.extracurriculars || [],
+                        display_name: data.display_name || "",
+                        avatar_base64: data.avatar_base64 || ""
                     });
                 }
             } catch (err) {
@@ -49,6 +53,28 @@ export default function ProfilePage() {
         };
         loadProfile();
     }, []);
+
+    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        // Validation
+        if (file.size > 200 * 1024) { // 200KB
+            toast.error("Image too large! Max 200KB.");
+            return;
+        }
+        if (!file.type.startsWith("image/")) {
+            toast.error("Only images allowed.");
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            const base64String = reader.result as string;
+            setFormData(prev => ({ ...prev, avatar_base64: base64String }));
+        };
+        reader.readAsDataURL(file);
+    };
 
     const handleSave = async (recalculate: boolean = false) => {
         setSaving(true);
@@ -111,8 +137,58 @@ export default function ProfilePage() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    {/* Left Col: Upload & Basic Info */}
+                    {/* Left Col: Avatar, Upload & Basic Info */}
                     <div className="space-y-6 md:col-span-1">
+
+                        {/* Avatar Card */}
+                        <Card className="bg-gray-900 border-gray-800 flex flex-col items-center p-6 text-center">
+                            <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-purple-500/30 mb-4 bg-gray-800 items-center justify-center flex">
+                                {formData.avatar_base64 ? (
+                                    <img src={formData.avatar_base64} alt="Avatar" className="w-full h-full object-cover" />
+                                ) : (
+                                    <User className="w-12 h-12 text-gray-500" />
+                                )}
+                            </div>
+                            <label className="cursor-pointer text-sm font-medium text-purple-400 hover:text-purple-300 transition-colors">
+                                Change Photo
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={handleImageUpload}
+                                />
+                            </label>
+                            <span className="text-xs text-gray-500 mt-1">Max 200KB</span>
+                        </Card>
+
+                        <Card className="bg-gray-900 border-gray-800">
+                            <CardHeader>
+                                <CardTitle className="text-white flex items-center gap-2 text-base">
+                                    Identity
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium text-gray-300">Display Name</label>
+                                    <Input
+                                        placeholder="Alex Hamilton"
+                                        className="bg-gray-950 border-gray-700 text-white"
+                                        value={formData.display_name}
+                                        onChange={e => setFormData({ ...formData, display_name: e.target.value })}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium text-gray-300">Personal Bio</label>
+                                    <Textarea
+                                        placeholder="Tell us about your goals..."
+                                        className="bg-gray-950 border-gray-700 text-white min-h-[100px]"
+                                        value={formData.bio}
+                                        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData({ ...formData, bio: e.target.value })}
+                                    />
+                                </div>
+                            </CardContent>
+                        </Card>
+
                         <Card className="bg-gray-900 border-gray-800">
                             <CardHeader>
                                 <CardTitle className="text-white flex items-center gap-2">
@@ -122,22 +198,6 @@ export default function ProfilePage() {
                             </CardHeader>
                             <CardContent>
                                 <FileUpload onUploadSuccess={(txt) => toast.success("Transcript uploaded and ready!")} />
-                            </CardContent>
-                        </Card>
-
-                        <Card className="bg-gray-900 border-gray-800">
-                            <CardHeader>
-                                <CardTitle className="text-white flex items-center gap-2">
-                                    <User className="w-5 h-5 text-blue-400" /> Personal Bio
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                <Textarea
-                                    placeholder="Tell us about your goals..."
-                                    className="bg-gray-950 border-gray-700 text-white min-h-[150px]"
-                                    value={formData.bio}
-                                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData({ ...formData, bio: e.target.value })}
-                                />
                             </CardContent>
                         </Card>
                     </div>

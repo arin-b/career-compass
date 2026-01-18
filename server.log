@@ -31,3 +31,8 @@
 2026-01-18 12:22:03,391 - career_compass - INFO - Executing: ALTER TABLE profiles ADD COLUMN IF NOT EXISTS manual_gpa FLOAT;
 2026-01-18 12:22:04,005 - career_compass - INFO - Executing: ALTER TABLE profiles ADD COLUMN IF NOT EXISTS manual_major VARCHAR;
 2026-01-18 12:22:04,620 - career_compass - INFO - Profile migration completed successfully.
+2026-01-18 15:14:07,937 - career_compass - INFO - Connecting to database to migrate Identity columns...
+2026-01-18 15:14:13,673 - career_compass - INFO - Running ALTER TABLE commands for 'users'...
+2026-01-18 15:14:13,673 - career_compass - INFO - Executing: ALTER TABLE users ADD COLUMN IF NOT EXISTS display_name TEXT;
+2026-01-18 15:14:14,549 - career_compass - INFO - Executing: ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_base64 TEXT;
+2026-01-18 15:14:15,163 - career_compass - INFO - Identity migration completed successfully.

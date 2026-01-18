@@ -36,6 +36,10 @@ class User(Base):
     full_name = Column(String, nullable=True)
     academic_level = Column(Enum(AcademicLevel), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
+    
+    # Identity Management
+    display_name = Column(String, nullable=True)
+    avatar_base64 = Column(Text, nullable=True) # Storing base64 string directly
 
     profile = relationship("Profile", back_populates="user", uselist=False)
     roadmaps = relationship("Roadmap", back_populates="user")

@@ -22,7 +22,7 @@ async def update_profile(
         profile = Profile(id=current_user.id)
         db.add(profile)
     
-    # Update fields
+    # Update Profile fields
     if profile_in.bio is not None:
         profile.bio = profile_in.bio
     if profile_in.hobbies is not None:
@@ -34,9 +34,23 @@ async def update_profile(
     if profile_in.manual_major is not None:
         profile.manual_major = profile_in.manual_major
         
+    # Update User Identity fields
+    if profile_in.display_name is not None:
+        current_user.display_name = profile_in.display_name
+    if profile_in.avatar_base64 is not None:
+        current_user.avatar_base64 = profile_in.avatar_base64
+        
+    db.add(current_user) # Mark user for update
     await db.commit()
     await db.refresh(profile)
-    return profile
+    await db.refresh(current_user)
+    
+    # Merge response
+    return {
+        **profile.__dict__,
+        "display_name": current_user.display_name,
+        "avatar_base64": current_user.avatar_base64
+    }
 
 @router.get("/", response_model=ProfileResponse)
 async def get_profile(
@@ -53,4 +67,9 @@ async def get_profile(
         await db.commit()
         await db.refresh(profile)
         
-    return profile
+    # Merge response
+    return {
+        **profile.__dict__,
+        "display_name": current_user.display_name,
+        "avatar_base64": current_user.avatar_base64
+    }

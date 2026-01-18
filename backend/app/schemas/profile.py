@@ -8,6 +8,10 @@ class ProfileUpdate(BaseModel):
     extracurriculars: Optional[List[str]] = []
     manual_gpa: Optional[float] = None
     manual_major: Optional[str] = None
+    
+    # Identity
+    display_name: Optional[str] = None
+    avatar_base64: Optional[str] = None
 
 class ProfileResponse(BaseModel):
     id: UUID
@@ -17,6 +21,10 @@ class ProfileResponse(BaseModel):
     manual_gpa: Optional[float] = None
     manual_major: Optional[str] = None
     transcript_summary: Optional[str] = None
+    
+    # Identity
+    display_name: Optional[str] = None
+    avatar_base64: Optional[str] = None
 
     class Config:
         from_attributes = True
