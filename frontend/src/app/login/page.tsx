@@ -36,7 +36,6 @@ export default function LoginPage() {
 
             const data = await res.json()
 
-            // Set cookie (client-side for demo, ideally server-side or httpOnly)
             document.cookie = `token=${data.access_token}; path=/; max-age=1800` // 30 min
 
             toast.success("Welcome back!")

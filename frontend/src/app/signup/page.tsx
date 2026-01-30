@@ -100,9 +100,9 @@ export default function SignupPage() {
                                         <SelectValue placeholder="Academic Level" />
                                     </SelectTrigger>
                                     <SelectContent className="bg-gray-900 border-gray-700 text-white">
-                                        <SelectItem value="HighSchool">High School</SelectItem>
+                                        <SelectItem value="HighSchool">School</SelectItem>
                                         <SelectItem value="Undergraduate">Undergraduate</SelectItem>
-                                        <SelectItem value="Graduate">Graduate</SelectItem>
+                                        <SelectItem value="Graduate">Post-Graduate</SelectItem>
                                         <SelectItem value="Other">Other</SelectItem>
                                     </SelectContent>
                                 </Select>

@@ -11,10 +11,6 @@ import { toast } from "sonner"
 import { motion } from "framer-motion"
 import { fetchClient } from "@/lib/api"
 
-// --- Components ---
-
-// FileUpload component moved to @/components/file-upload
-
 const Sidebar = () => {
     const [profile, setProfile] = useState<any>(null);
 
@@ -24,7 +20,6 @@ const Sidebar = () => {
         });
     }, []);
 
-    // Determine display values (Manual > Transcript/Default)
     const major = profile?.manual_major || "Computer Science (Default)";
     const gpa = profile?.manual_gpa || "3.8 (Default)";
     const name = profile?.display_name || "Alex H.";
@@ -223,7 +218,6 @@ const RoadmapTimeline = () => {
     const router = useRouter();
 
     const handleLogout = () => {
-        // Remove token from cookie
         document.cookie = "token=; path=/; max-age=0";
 
         toast.success("Logged out successfully.");
@@ -239,7 +233,6 @@ const RoadmapTimeline = () => {
         }
 
         try {
-            // Hardcoded user ID for demo (Alex)
             const userId = "7dd566d5-5571-40f6-b913-e5e681ea0cb1";
 
             const payload = {
@@ -284,7 +277,6 @@ const RoadmapTimeline = () => {
 
         } catch (error: any) {
             console.error("Generator Error:", error);
-            // Alert specific error to screen for debugging
             alert(`Error: ${error.message}`);
             toast.error(`Error generating roadmap: ${error.message}`);
         } finally {
@@ -303,7 +295,6 @@ const RoadmapTimeline = () => {
 
             if (!res.ok) throw new Error("Failed to update milestone");
 
-            // Update local state
             setSteps(prevSteps =>
                 prevSteps.map(step =>
                     step.id === milestoneId
@@ -418,8 +409,6 @@ const ChatInterface = () => {
             });
             const data = await res.json();
 
-            // The backend returns { response: string, context: [] }
-            // Let's format it nicely
             const content = (
                 <div className="space-y-2">
                     <p>{data.response}</p>

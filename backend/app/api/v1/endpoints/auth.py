@@ -13,7 +13,6 @@ router = APIRouter()
 
 @router.post("/signup", response_model=UserResponse)
 async def create_user(user_in: UserCreate, db: AsyncSession = Depends(get_db)):
-    # Check if user exists
     result = await db.execute(select(User).where(User.email == user_in.email))
     existing_user = result.scalar_one_or_none()
     if existing_user:
@@ -22,7 +21,6 @@ async def create_user(user_in: UserCreate, db: AsyncSession = Depends(get_db)):
             detail="The user with this email already exists in the system.",
         )
     
-    # Create User
     new_user = User(
         email=user_in.email,
         hashed_password=security.get_password_hash(user_in.password),
@@ -32,7 +30,6 @@ async def create_user(user_in: UserCreate, db: AsyncSession = Depends(get_db)):
     db.add(new_user)
     await db.flush() # get ID
 
-    # Create empty Profile
     new_profile = Profile(id=new_user.id)
     db.add(new_profile)
 
@@ -43,7 +40,6 @@ async def create_user(user_in: UserCreate, db: AsyncSession = Depends(get_db)):
 
 @router.post("/login", response_model=Token)
 async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)):
-    # Try to fetch user
     result = await db.execute(select(User).where(User.email == form_data.username))
     user = result.scalar_one_or_none()
     

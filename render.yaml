@@ -17,6 +17,8 @@ services:
         generateValue: true
       - key: ALLOWED_ORIGINS
         value: https://career-compass-frontend-6cv7.onrender.com
+      - key: GOOGLE_API_KEY
+        value: AIzaSyDZfRFJAGkxWOYmZMtjTJZ4CvdpeTOcZ8A
 
   # Frontend Service
   - type: web
@@ -28,4 +30,5 @@ services:
     startCommand: npm start
     rootDir: frontend
     envVars:
-      # Removed NEXT_PUBLIC_API_URL to set manually later
+      - key: GOOGLE_API_KEY
+        value: AIzaSyDZfRFJAGkxWOYmZMtjTJZ4CvdpeTOcZ8A

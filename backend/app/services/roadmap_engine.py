@@ -14,7 +14,6 @@ GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 def get_llm():
     if not GOOGLE_API_KEY:
         raise ValueError("GOOGLE_API_KEY not found")
-    # Using a model capable of reliable JSON generation
     return ChatGoogleGenerativeAI(model="gemini-flash-latest", google_api_key=GOOGLE_API_KEY, temperature=0.2)
 
 async def generate_career_roadmap(transcript_text: str, interests: List[str], manual_profile_data: Dict[str, Any] = None) -> Dict[str, Any]:
@@ -26,17 +25,14 @@ async def generate_career_roadmap(transcript_text: str, interests: List[str], ma
 
     llm = get_llm()
     
-    # Extract manual overrides
     manual_gpa = manual_profile_data.get("manual_gpa")
     manual_major = manual_profile_data.get("manual_major")
     hobbies = manual_profile_data.get("hobbies", [])
     extracurriculars = manual_profile_data.get("extracurriculars", [])
     bio = manual_profile_data.get("bio", "")
 
-    # Construct Context String
     context_parts = []
     
-    # 1. Transcript / Academic Context
     if manual_major or manual_gpa:
         context_parts.append("MANUAL ACADEMIC DATA (PRIORITY):")
         if manual_major:

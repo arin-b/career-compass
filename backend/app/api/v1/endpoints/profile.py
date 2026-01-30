@@ -13,16 +13,13 @@ async def update_profile(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    # Fetch profile
     result = await db.execute(select(Profile).where(Profile.id == current_user.id))
     profile = result.scalar_one_or_none()
     
     if not profile:
-        # Create if not exists
         profile = Profile(id=current_user.id)
         db.add(profile)
     
-    # Update Profile fields
     if profile_in.bio is not None:
         profile.bio = profile_in.bio
     if profile_in.hobbies is not None:
@@ -34,7 +31,6 @@ async def update_profile(
     if profile_in.manual_major is not None:
         profile.manual_major = profile_in.manual_major
         
-    # Update User Identity fields
     if profile_in.display_name is not None:
         current_user.display_name = profile_in.display_name
     if profile_in.avatar_base64 is not None:
@@ -45,7 +41,6 @@ async def update_profile(
     await db.refresh(profile)
     await db.refresh(current_user)
     
-    # Merge response
     return {
         **profile.__dict__,
         "display_name": current_user.display_name,
@@ -61,13 +56,11 @@ async def get_profile(
     profile = result.scalar_one_or_none()
     
     if not profile:
-        # Auto-create empty profile
         profile = Profile(id=current_user.id)
         db.add(profile)
         await db.commit()
         await db.refresh(profile)
         
-    # Merge response
     return {
         **profile.__dict__,
         "display_name": current_user.display_name,

@@ -17,7 +17,6 @@ export default function ProfilePage() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
 
-    // Profile State
     const [formData, setFormData] = useState({
         manual_major: "",
         manual_gpa: "",
@@ -58,7 +57,6 @@ export default function ProfilePage() {
         const file = e.target.files?.[0];
         if (!file) return;
 
-        // Validation
         if (file.size > 200 * 1024) { // 200KB
             toast.error("Image too large! Max 200KB.");
             return;
@@ -95,15 +93,12 @@ export default function ProfilePage() {
 
             if (recalculate) {
                 toast.info("Regenerating roadmap...");
-                // Trigger generation
-                // We pass "uploadedTranscript: true" equivalent logic if we want, or just empty params relying on backend precedence
-                // The backend uses Profile data if payload is empty/default.
                 const genRes = await fetchClient("/roadmaps/generate", {
                     method: "POST",
                     body: JSON.stringify({
-                        user_id: "7dd566d5-5571-40f6-b913-e5e681ea0cb1", // Mock ID or fetch from context 
-                        interests: ["Software Engineering"], // Ideally this comes from DB too
-                        transcript_summary: "No transcript provided" // Forces backend to look up profile
+                        user_id: "7dd566d5-5571-40f6-b913-e5e681ea0cb1", 
+                        interests: ["Software Engineering"],
+                        transcript_summary: "No transcript provided" 
                     })
                 });
 

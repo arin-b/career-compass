@@ -27,13 +27,10 @@ async def generate_roadmap(request: GenerateRoadmapRequest, db: AsyncSession = D
     """
     logger.info(f"Received generation request for user {current_user.id}")
     
-    # Verify user exists (from token)
     user = current_user
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
-    # Fetch Profile for Transcript if not provided in request
-    # Also fetch manual data
     manual_data = {}
     
     profile_result = await db.execute(select(Profile).where(Profile.id == request.user_id))
@@ -54,17 +51,14 @@ async def generate_roadmap(request: GenerateRoadmapRequest, db: AsyncSession = D
         }
             
     if not transcript_text:
-         # Fix: Return 400 instead of generic interest to force user to upload transcript
          raise HTTPException(
              status_code=400, 
              detail="Please upload a transcript first so we can generate a personalized roadmap."
          )
 
     try:
-         # Call AI Engine with manual data
         roadmap_json = await generate_career_roadmap(transcript_text, request.interests, manual_data)
         
-        # Save to DB
         new_roadmap = Roadmap(
             user_id=user.id,
             title=roadmap_json.get("title", "Generated Career Roadmap"),
@@ -91,13 +85,11 @@ async def generate_roadmap(request: GenerateRoadmapRequest, db: AsyncSession = D
         await db.commit()
         await db.refresh(new_roadmap)
         
-        # Fetch created milestones with IDs
         milestones_result = await db.execute(
             select(RoadmapMilestone).where(RoadmapMilestone.roadmap_id == new_roadmap.id)
         )
         created_milestones = milestones_result.scalars().all()
         
-        # Add IDs to the roadmap JSON
         roadmap_with_ids = roadmap_json.copy()
         if "milestones" in roadmap_with_ids and created_milestones:
             for i, milestone_db in enumerate(created_milestones):
@@ -130,7 +122,6 @@ async def update_milestone_status(
     """
     logger.info(f"Updating milestone {milestone_id} to status {request.status}")
     
-    # Fetch milestone
     result = await db.execute(
         select(RoadmapMilestone).where(RoadmapMilestone.id == milestone_id)
     )
@@ -139,7 +130,6 @@ async def update_milestone_status(
     if not milestone:
         raise HTTPException(status_code=404, detail="Milestone not found")
     
-    # Update status
     milestone.status = request.status
     await db.commit()
     await db.refresh(milestone)

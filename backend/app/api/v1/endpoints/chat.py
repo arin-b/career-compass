@@ -30,12 +30,9 @@ async def upload_transcript(
 @router.post("/chat")
 async def chat(request: ChatRequest, db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)):
     try:
-        # RAG: Retrieve context + LLM Response
         result = await query_vector_db(request.query, db)
-        # Debug: Print the LLM response
         print(f"LLM Response: {result}")
         
-        # Map 'reply' to 'response' for frontend standardization
         return {
             "response": result.get("reply"),
             "context": result.get("context", [])

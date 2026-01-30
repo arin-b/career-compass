@@ -37,7 +37,6 @@ class User(Base):
     academic_level = Column(Enum(AcademicLevel), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     
-    # Identity Management
     display_name = Column(String, nullable=True)
     avatar_base64 = Column(Text, nullable=True) # Storing base64 string directly
 
@@ -53,7 +52,6 @@ class Profile(Base):
     transcript_summary = Column(Text, nullable=True)
     skills = Column(JSONB, default=list)
     
-    # New Fields for Profile Upgrade
     bio = Column(Text, nullable=True)
     hobbies = Column(JSONB, default=list)
     extracurriculars = Column(JSONB, default=list)
