@@ -256,8 +256,20 @@ const RoadmapTimeline = () => {
             const data = await res.json();
             console.log("Response received:", data);
 
-            if (data.roadmap && data.roadmap.milestones) {
-                const newSteps = data.roadmap.milestones.map((m: any, index: number) => ({
+            let roadmapData = data.roadmap;
+
+            // FIX: Handle case where roadmap is nested in a 'text' field (stringified JSON)
+            if (roadmapData && !roadmapData.milestones && roadmapData.text) {
+                try {
+                    console.log("Parsing nested roadmap from 'text' field...");
+                    roadmapData = JSON.parse(roadmapData.text);
+                } catch (e) {
+                    console.error("Failed to parse nested roadmap JSON:", e);
+                }
+            }
+
+            if (roadmapData && roadmapData.milestones) {
+                const newSteps = roadmapData.milestones.map((m: any, index: number) => ({
                     id: m.id || `milestone-${index}`,
                     title: m.title,
                     semester: m.semester,
@@ -271,8 +283,9 @@ const RoadmapTimeline = () => {
                 setSteps(newSteps);
                 toast.success("Roadmap Successfully Generated!");
             } else {
+                console.error("Roadmap Data Missing. Received:", data);
                 console.warn("Unexpected response structure:", data);
-                toast.success("Roadmap Generated (No milestones found)!");
+                toast.error("Roadmap generated but no milestones found.");
             }
 
         } catch (error: any) {
