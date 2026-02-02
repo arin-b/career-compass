@@ -36,3 +36,7 @@
 2026-01-18 15:14:13,673 - career_compass - INFO - Executing: ALTER TABLE users ADD COLUMN IF NOT EXISTS display_name TEXT;
 2026-01-18 15:14:14,549 - career_compass - INFO - Executing: ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_base64 TEXT;
 2026-01-18 15:14:15,163 - career_compass - INFO - Identity migration completed successfully.
+2026-02-02 20:00:06,106 - career_compass - INFO - Connecting to database to migrate Role column...
+2026-02-02 20:00:17,346 - career_compass - INFO - Running ALTER TABLE command for 'users'...
+2026-02-02 20:00:17,346 - career_compass - INFO - Executing: ALTER TABLE users ADD COLUMN IF NOT EXISTS role VARCHAR DEFAULT 'user' NOT NULL;
+2026-02-02 20:00:18,473 - career_compass - INFO - Role migration completed successfully.

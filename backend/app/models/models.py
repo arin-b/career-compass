@@ -39,6 +39,7 @@ class User(Base):
     
     display_name = Column(String, nullable=True)
     avatar_base64 = Column(Text, nullable=True) # Storing base64 string directly
+    role = Column(String, default="user", nullable=False)
 
     profile = relationship("Profile", back_populates="user", uselist=False)
     roadmaps = relationship("Roadmap", back_populates="user")

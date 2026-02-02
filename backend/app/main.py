@@ -37,8 +37,9 @@ async def shutdown_event():
 app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
 app.include_router(chat.router, prefix="/api/v1")
 app.include_router(roadmaps.router, prefix="/api/v1/roadmaps")
-from app.api.v1.endpoints import profile
+from app.api.v1.endpoints import profile, admin
 app.include_router(profile.router, prefix="/api/v1/users/profile", tags=["profile"])
+app.include_router(admin.router, prefix="/api/v1/admin", tags=["admin"])
 
 @app.get("/")
 def read_root():

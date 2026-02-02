@@ -44,7 +44,8 @@ async def update_profile(
     return {
         **profile.__dict__,
         "display_name": current_user.display_name,
-        "avatar_base64": current_user.avatar_base64
+        "avatar_base64": current_user.avatar_base64,
+        "role": current_user.role
     }
 
 @router.get("/", response_model=ProfileResponse)
@@ -64,5 +65,6 @@ async def get_profile(
     return {
         **profile.__dict__,
         "display_name": current_user.display_name,
-        "avatar_base64": current_user.avatar_base64
+        "avatar_base64": current_user.avatar_base64,
+        "role": current_user.role
     }

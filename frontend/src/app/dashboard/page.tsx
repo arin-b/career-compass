@@ -11,68 +11,7 @@ import { toast } from "sonner"
 import { motion } from "framer-motion"
 import { fetchClient } from "@/lib/api"
 
-const Sidebar = () => {
-    const [profile, setProfile] = useState<any>(null);
-
-    useEffect(() => {
-        fetchClient("/users/profile").then(async res => {
-            if (res.ok) setProfile(await res.json());
-        });
-    }, []);
-
-    const major = profile?.manual_major || "Computer Science (Default)";
-    const gpa = profile?.manual_gpa || "3.8 (Default)";
-    const name = profile?.display_name || "Alex H.";
-    const avatar = profile?.avatar_base64;
-
-    return (
-        <div className="w-64 bg-gray-900 text-white flex flex-col h-full border-r border-gray-800">
-            <div className="p-6 border-b border-gray-800 flex items-center gap-2">
-                <Map className="w-6 h-6 text-purple-400" />
-                <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
-                    CareerCompass
-                </span>
-            </div>
-            <div className="p-6 space-y-6">
-                <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-purple-500 to-pink-500 p-[2px]">
-                        <div className="w-full h-full rounded-full bg-gray-900 flex items-center justify-center overflow-hidden">
-                            {avatar ? (
-                                <img src={avatar} alt="User" className="w-full h-full object-cover" />
-                            ) : (
-                                <User className="w-6 h-6 text-white" />
-                            )}
-                        </div>
-                    </div>
-                    <div>
-                        <h3 className="font-medium text-lg">{name}</h3>
-                        <a href="/profile" className="text-xs text-purple-400 hover:text-purple-300 flex items-center gap-1">
-                            Edit Profile <ChevronRight className="w-3 h-3" />
-                        </a>
-                    </div>
-                </div>
-
-                <div className="space-y-4">
-                    <Card className="bg-gray-800 border-gray-700">
-                        <CardContent className="p-4 space-y-2">
-                            <div className="flex items-center gap-2 text-sm text-gray-300">
-                                <GraduationCap className="w-4 h-4 text-purple-400" />
-                                <span className="truncate" title={major}>{major}</span>
-                            </div>
-                            <div className="flex items-center gap-2 text-sm text-gray-300">
-                                <BookOpen className="w-4 h-4 text-blue-400" />
-                                <span>GPA: {gpa}</span>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </div>
-            </div>
-            <div className="mt-auto p-6 text-xs text-gray-600">
-                v0.2.0 Beta
-            </div>
-        </div>
-    )
-}
+import { Sidebar } from "@/components/Sidebar";
 
 interface TimelineItemProps {
     title: string;

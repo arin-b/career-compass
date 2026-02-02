@@ -23,6 +23,7 @@ class ProfileResponse(BaseModel):
     
     display_name: Optional[str] = None
     avatar_base64: Optional[str] = None
+    role: Optional[str] = "user"
 
     class Config:
         from_attributes = True
