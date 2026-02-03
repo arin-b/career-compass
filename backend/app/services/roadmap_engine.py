@@ -32,51 +32,31 @@ async def generate_career_roadmap(transcript_text: str, interests: List[str], ma
     bio = manual_profile_data.get("bio", "")
     additional_context = manual_profile_data.get("additional_context", "")
 
-    context_parts = []
+    # Construct formatted profile string for the prompt
+    user_profile_str = f"""
+    CURRENT USER PROFILE:
+    - Transcript Major: {manual_major if manual_major else 'Extracted from Transcript'}
+    - MANUAL TARGET MAJOR/FIELD: {manual_major if manual_major else 'N/A'}
+    - GPA: {manual_gpa if manual_gpa else 'N/A'}
+    - Hobbies/Interests: {', '.join(hobbies)}
+    - Extracurriculars: {', '.join(extracurriculars)}
+    - CRITICAL CONTEXT (USER GOALS): {additional_context}
     
-    if manual_major or manual_gpa:
-        context_parts.append("1. ACADEMIC BACKGROUND:")
-        if manual_major:
-            context_parts.append(f"- Major: {manual_major}")
-        if manual_gpa:
-            context_parts.append(f"- GPA: {manual_gpa}")
-    
-    if transcript_text:
-        context_parts.append("\n(Transcript Details):")
-        context_parts.append(transcript_text)
-
-    # 2. Personal Context
-    if bio or hobbies or extracurriculars:
-        context_parts.append("\n2. PERSONAL PROFILE:")
-        if bio:
-            context_parts.append(f"- Bio: {bio}")
-        if hobbies:
-            context_parts.append(f"- Hobbies: {', '.join(hobbies)}")
-        if extracurriculars:
-            context_parts.append(f"- Extracurriculars: {', '.join(extracurriculars)}")
-
-    # 3. User Specific Context
-    if additional_context:
-        context_parts.append("\n3. USER'S SPECIFIC REQUEST/CONTEXT:")
-        context_parts.append(additional_context)
-
-    # 4. Interests
-    context_parts.append(f"\n4. INTERESTS:\n{', '.join(interests)}")
+    TRANSCRIPT DATA (Background):
+    {transcript_text[:5000] if transcript_text else 'N/A'} 
+    """
 
     system_prompt = """You are an expert Career Counselor AI.
     Your goal is to create a detailed, semester-by-semester career roadmap based on the COMPLETE user profile provided.
     
     CRITICAL INSTRUCTIONS:
     1. **Holistic Analysis**: You MUST incorporate the 'USER'S SPECIFIC REQUEST' and 'PERSONAL PROFILE' into the roadmap.
-       - If they mention a specific goal in the user context, prioritize it.
-       - Connect their hobbies/extracurriculars to their career path (e.g., if they like Art and Coding, suggest Frontend/UI/UX projects).
-    2. **Academic Alignment**: Use the transcript to gauge their current level.
-    3. **Structure**: Output strictly valid JSON.
-    
-    Output:
-    - Strictly valid JSON format.
-    - No markdown formatting.
-    - The JSON must follow this structure:
+    2. **Pivot Logic**: If the 'MANUAL TARGET MAJOR' or 'CRITICAL CONTEXT' indicates a desire to change fields (e.g., CS student wanting to be an Economist), YOU MUST PRIORITIZE THE USER'S GOAL over their transcript history. 
+       - Create a roadmap for the new field.
+       - Use the transcript only to identify transferable skills (math, logic, etc.).
+       - Do NOT force them into a career path matching their transcript if they explicitly asked for something else.
+    3. **Academic Alignment**: Use the transcript to gauge their current level if relevant to the target field.
+    4. **Structure**: Output strictly valid JSON.
     
     Output:
     - Strictly valid JSON format.
@@ -98,13 +78,15 @@ async def generate_career_roadmap(transcript_text: str, interests: List[str], ma
     }
     """
     
-    context_str = "\n".join(context_parts)
     user_input = f"""
     STUDENT CONTEXT:
-    {context_str}
+    {user_profile_str}
     
     Generate the roadmap JSON now.
     """
+    
+    logger.info(f"FINAL PROMPT SYSTEM:\n{system_prompt}")
+    logger.info(f"FINAL PROMPT USER:\n{user_input}")
     
     logger.info("Sending Roadmap Generation Request to Gemini...")
     
