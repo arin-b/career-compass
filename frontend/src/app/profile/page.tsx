@@ -135,12 +135,11 @@ export default function ProfilePage() {
 
             if (recalculate) {
                 toast.info("Regenerating roadmap...");
+                // Just send user_id, backend fetches the rest from the profile we just saved.
                 const genRes = await fetchClient("/roadmaps/generate", {
                     method: "POST",
                     body: JSON.stringify({
-                        user_id: "7dd566d5-5571-40f6-b913-e5e681ea0cb1",
-                        interests: ["Software Engineering"],
-                        transcript_summary: "No transcript provided"
+                        user_id: "7dd566d5-5571-40f6-b913-e5e681ea0cb1" // TODO: Use actual user ID from context/auth
                     })
                 });
 

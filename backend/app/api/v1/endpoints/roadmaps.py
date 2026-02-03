@@ -15,15 +15,13 @@ logger = get_logger()
 
 class GenerateRoadmapRequest(BaseModel):
     user_id: uuid.UUID
-    interests: List[str]
-    transcript_summary: str = "No transcript provided"
 
 from app.api.deps import get_current_user
 
 @router.post("/generate")
 async def generate_roadmap(request: GenerateRoadmapRequest, db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)):
     """
-    Generates a career roadmap for the given user.
+    Generates a career roadmap for the given user using their profile data.
     """
     logger.info(f"Received generation request for user {current_user.id}")
     
@@ -31,36 +29,47 @@ async def generate_roadmap(request: GenerateRoadmapRequest, db: AsyncSession = D
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
-    manual_data = {}
-    
+    # Fetch Profile
     profile_result = await db.execute(select(Profile).where(Profile.id == request.user_id))
     profile = profile_result.scalar_one_or_none()
     
-    transcript_text = request.transcript_summary
-    if not transcript_text or transcript_text == "No transcript provided":
-        if profile and profile.transcript_summary:
-            transcript_text = profile.transcript_summary
-            
-    if profile:
-        manual_data = {
-            "manual_gpa": profile.manual_gpa,
-            "manual_major": profile.manual_major,
-            "hobbies": profile.hobbies,
-            "extracurriculars": profile.extracurriculars,
-            "hobbies": profile.hobbies,
-            "extracurriculars": profile.extracurriculars,
-            "bio": profile.bio,
-            "additional_context": profile.additional_context
-        }
-            
+    if not profile:
+        raise HTTPException(status_code=400, detail="Profile not found. Please complete your profile first.")
+
+    manual_data = {
+        "manual_gpa": profile.manual_gpa,
+        "manual_major": profile.manual_major,
+        "hobbies": profile.hobbies,
+        "extracurriculars": profile.extracurriculars,
+        "bio": profile.bio,
+        "additional_context": profile.additional_context
+    }
+    
+    transcript_text = profile.transcript_summary
     if not transcript_text:
-         raise HTTPException(
-             status_code=400, 
-             detail="Please upload a transcript first so we can generate a personalized roadmap."
-         )
+         # Check if we should allow generation without transcript if manual data is rich enough?
+         # For now, stick to the rule: Need transcript or detailed manual entry?
+         # The prompt engine handles missing transcript gracefully if manual data exists, 
+         # but let's warn if absolutely nothing.
+         if not (profile.manual_major or profile.additional_context):
+              raise HTTPException(
+                  status_code=400, 
+                  detail="Please upload a transcript or provide profile details to generate a roadmap."
+              )
+         transcript_text = "No transcript provided."
+
+    # Derive interests from hobbies/extracurriculars if not explicitly passed (since we removed them from input)
+    # We can treat hobbies as interests.
+    interests = profile.hobbies if profile.hobbies else []
+    if profile.extracurriculars:
+        interests.extend(profile.extracurriculars)
+    
+    # If explicitly empty, maybe default to "General Career Advice" or similar
+    if not interests:
+        interests = ["General Career Growth"]
 
     try:
-        roadmap_json = await generate_career_roadmap(transcript_text, request.interests, manual_data)
+        roadmap_json = await generate_career_roadmap(transcript_text, interests, manual_data)
         
         new_roadmap = Roadmap(
             user_id=user.id,

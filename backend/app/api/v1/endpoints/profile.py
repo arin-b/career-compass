@@ -35,6 +35,8 @@ async def update_profile(
         current_user.display_name = profile_in.display_name
     if profile_in.avatar_base64 is not None:
         current_user.avatar_base64 = profile_in.avatar_base64
+    if profile_in.additional_context is not None:
+        profile.additional_context = profile_in.additional_context
         
     db.add(current_user) # Mark user for update
     await db.commit()
