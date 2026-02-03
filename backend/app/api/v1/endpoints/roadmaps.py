@@ -47,7 +47,10 @@ async def generate_roadmap(request: GenerateRoadmapRequest, db: AsyncSession = D
             "manual_major": profile.manual_major,
             "hobbies": profile.hobbies,
             "extracurriculars": profile.extracurriculars,
-            "bio": profile.bio
+            "hobbies": profile.hobbies,
+            "extracurriculars": profile.extracurriculars,
+            "bio": profile.bio,
+            "additional_context": profile.additional_context
         }
             
     if not transcript_text:

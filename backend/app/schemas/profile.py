@@ -11,6 +11,7 @@ class ProfileUpdate(BaseModel):
     
     display_name: Optional[str] = None
     avatar_base64: Optional[str] = None
+    additional_context: Optional[str] = None
 
 class ProfileResponse(BaseModel):
     id: UUID
@@ -24,6 +25,9 @@ class ProfileResponse(BaseModel):
     display_name: Optional[str] = None
     avatar_base64: Optional[str] = None
     role: Optional[str] = "user"
+
+    transcript_metadata: List[dict] = []
+    additional_context: Optional[str] = None
 
     class Config:
         from_attributes = True

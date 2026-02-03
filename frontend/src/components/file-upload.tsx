@@ -6,7 +6,7 @@ import { Upload } from "lucide-react";
 import { toast } from "sonner";
 import { fetchClient } from "@/lib/api";
 
-export const FileUpload = ({ onUploadSuccess }: { onUploadSuccess: (text: string) => void }) => {
+export const FileUpload = ({ onUploadSuccess, mode = "replace" }: { onUploadSuccess: (text: string) => void, mode?: "replace" | "append" }) => {
     const [uploading, setUploading] = useState(false);
 
     const onDrop = useCallback(async (acceptedFiles: File[]) => {
@@ -16,13 +16,11 @@ export const FileUpload = ({ onUploadSuccess }: { onUploadSuccess: (text: string
         setUploading(true);
         const formData = new FormData();
         formData.append("file", file);
-        // user_id is handled by backend token now, but we kept it in form previously? 
-        // Backend 'upload_transcript' uses 'current_user' from token. It doesn't use form's user_id.
 
         try {
-            toast.info("Uploading and analyzing transcript...");
+            toast.info(`Uploading (${mode} mode) and analyzing transcript...`);
             // Use fetchClient to handle Auth
-            const res = await fetchClient("/upload-transcript", {
+            const res = await fetchClient(`/upload-transcript?mode=${mode}`, {
                 method: "POST",
                 body: formData,
             });

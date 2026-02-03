@@ -51,6 +51,7 @@ class Profile(Base):
     id = Column(UUID(as_uuid=True), ForeignKey("users.id"), primary_key=True)
     interests = Column(JSONB, default=list)
     transcript_summary = Column(Text, nullable=True)
+    transcript_metadata = Column(JSONB, default=list) # List of uploaded files
     skills = Column(JSONB, default=list)
     
     bio = Column(Text, nullable=True)
@@ -58,6 +59,7 @@ class Profile(Base):
     extracurriculars = Column(JSONB, default=list)
     manual_gpa = Column(Float, nullable=True)
     manual_major = Column(String, nullable=True)
+    additional_context = Column(Text, nullable=True) # User's custom request/context
 
     user = relationship("User", back_populates="profile")
 

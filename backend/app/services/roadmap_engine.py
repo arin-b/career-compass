@@ -30,22 +30,24 @@ async def generate_career_roadmap(transcript_text: str, interests: List[str], ma
     hobbies = manual_profile_data.get("hobbies", [])
     extracurriculars = manual_profile_data.get("extracurriculars", [])
     bio = manual_profile_data.get("bio", "")
+    additional_context = manual_profile_data.get("additional_context", "")
 
     context_parts = []
     
     if manual_major or manual_gpa:
-        context_parts.append("MANUAL ACADEMIC DATA (PRIORITY):")
+        context_parts.append("1. ACADEMIC BACKGROUND:")
         if manual_major:
             context_parts.append(f"- Major: {manual_major}")
         if manual_gpa:
             context_parts.append(f"- GPA: {manual_gpa}")
     
-    context_parts.append("\nTRANSCRIPT SUMMARY (Background):")
-    context_parts.append(transcript_text)
+    if transcript_text:
+        context_parts.append("\n(Transcript Details):")
+        context_parts.append(transcript_text)
 
     # 2. Personal Context
     if bio or hobbies or extracurriculars:
-        context_parts.append("\nPERSONAL PROFILE:")
+        context_parts.append("\n2. PERSONAL PROFILE:")
         if bio:
             context_parts.append(f"- Bio: {bio}")
         if hobbies:
@@ -53,16 +55,28 @@ async def generate_career_roadmap(transcript_text: str, interests: List[str], ma
         if extracurriculars:
             context_parts.append(f"- Extracurriculars: {', '.join(extracurriculars)}")
 
-    # 3. Interests
-    context_parts.append(f"\nINTERESTS:\n{', '.join(interests)}")
+    # 3. User Specific Context
+    if additional_context:
+        context_parts.append("\n3. USER'S SPECIFIC REQUEST/CONTEXT:")
+        context_parts.append(additional_context)
+
+    # 4. Interests
+    context_parts.append(f"\n4. INTERESTS:\n{', '.join(interests)}")
 
     system_prompt = """You are an expert Career Counselor AI.
-    Your goal is to create a detailed, semester-by-semester career roadmap for a student.
+    Your goal is to create a detailed, semester-by-semester career roadmap based on the COMPLETE user profile provided.
     
-    CRITICAL INSTRUCTION:
-    - Prioritize 'MANUAL ACADEMIC DATA' over valid data found in the 'TRANSCRIPT SUMMARY'.
-    - Use 'PERSONAL PROFILE' (Hobbies, Extracurriculars) to suggest personalized "Pet Projects" or "Club Activities". 
-      For example, if they like Chess + Coding, suggest building a Chess Engine.
+    CRITICAL INSTRUCTIONS:
+    1. **Holistic Analysis**: You MUST incorporate the 'USER'S SPECIFIC REQUEST' and 'PERSONAL PROFILE' into the roadmap.
+       - If they mention a specific goal in the user context, prioritize it.
+       - Connect their hobbies/extracurriculars to their career path (e.g., if they like Art and Coding, suggest Frontend/UI/UX projects).
+    2. **Academic Alignment**: Use the transcript to gauge their current level.
+    3. **Structure**: Output strictly valid JSON.
+    
+    Output:
+    - Strictly valid JSON format.
+    - No markdown formatting.
+    - The JSON must follow this structure:
     
     Output:
     - Strictly valid JSON format.

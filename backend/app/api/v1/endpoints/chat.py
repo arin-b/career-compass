@@ -16,12 +16,13 @@ from app.models.models import User
 @router.post("/upload-transcript")
 async def upload_transcript(
     file: UploadFile = File(...), 
+    mode: str = "replace",  # 'replace' | 'append'
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
     try:
-        print(f"Receiving upload: {file.filename}, content_type: {file.content_type}")
-        return await process_transcript(current_user.id, file, db)
+        print(f"Receiving upload: {file.filename}, mode: {mode}, content_type: {file.content_type}")
+        return await process_transcript(current_user.id, file, db, mode)
     except Exception as e:
         print(f"CRITICAL ERROR in /upload-transcript: {e}")
         from fastapi.responses import JSONResponse

@@ -35,9 +35,12 @@ from app.models.models import VectorStore, Profile
 from sqlalchemy import update
 from uuid import UUID
 
-async def process_transcript(user_id: UUID, file: UploadFile, db: AsyncSession):
+async def process_transcript(user_id: UUID, file: UploadFile, db: AsyncSession, mode: str = "replace"):
     """
     Reads a PDF using pdfplumber, extracts text, saves to Profile, and updates VectorStore.
+    Modes:
+    - 'replace': Overwrites existing transcript text/metadata.
+    - 'append': Appends new text/metadata to existing.
     """
     if file.content_type != "application/pdf":
         raise HTTPException(status_code=400, detail="File must be a PDF")
@@ -57,12 +60,36 @@ async def process_transcript(user_id: UUID, file: UploadFile, db: AsyncSession):
     result = await db.execute(select(Profile).where(Profile.id == user_id))
     profile = result.scalar_one_or_none()
     
+    from datetime import datetime
+    new_metadata = {"name": file.filename, "date": datetime.utcnow().isoformat()}
+
     if profile:
-        profile.transcript_summary = text
+        if mode == "append":
+            # Append text with a separator
+            current_text = profile.transcript_summary or ""
+            profile.transcript_summary = current_text + "\n\n--- NEW FILE: " + file.filename + " ---\n\n" + text
+            
+            # Append metadata
+            current_meta = profile.transcript_metadata or []
+            # Ensure it's a list (in case of null/unexpected type from DB)
+            if not isinstance(current_meta, list):
+                current_meta = []
+            current_meta.append(new_metadata)
+            profile.transcript_metadata = list(current_meta) # Force update detection
+        else:
+            # Replace mode (default)
+            profile.transcript_summary = text
+            profile.transcript_metadata = [new_metadata]
     else:
-        profile = Profile(id=user_id, transcript_summary=text)
+        profile = Profile(
+            id=user_id, 
+            transcript_summary=text,
+            transcript_metadata=[new_metadata]
+        )
         db.add(profile)
     
+    # We must explicitly flag JSON update if modifying in-place, but here we reassigned.
+    db.add(profile)
     await db.commit()
 
     text_splitter = RecursiveCharacterTextSplitter(
