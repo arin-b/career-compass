@@ -92,9 +92,12 @@ async def generate_roadmap(request: GenerateRoadmapRequest, db: AsyncSession = D
         
         roadmap_with_ids = roadmap_json.copy()
         if "milestones" in roadmap_with_ids and created_milestones:
+            # Map created milestones by title (or sequence if titles assume uniqueness, which is risky but standard for initial generation)
+            # Using index is safest for initial generation sequence mapping
             for i, milestone_db in enumerate(created_milestones):
                 if i < len(roadmap_with_ids["milestones"]):
                     roadmap_with_ids["milestones"][i]["id"] = str(milestone_db.id)
+                    logger.info(f"Injecting ID {milestone_db.id} for milestone {roadmap_with_ids['milestones'][i].get('title')}")
         
         return {
             "message": "Roadmap generated successfully", 
@@ -106,6 +109,92 @@ async def generate_roadmap(request: GenerateRoadmapRequest, db: AsyncSession = D
         logger.error(f"Failed to generate roadmap: {e}")
         await db.rollback()
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/latest")
+async def get_latest_roadmap(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Retrieves the user's latest active roadmap with real Milestone UUIDs.
+    """
+    # Fetch latest roadmap
+    result = await db.execute(
+        select(Roadmap)
+        .where(Roadmap.user_id == current_user.id)
+        .order_by(Roadmap.created_at.desc())
+        .limit(1)
+    )
+    roadmap = result.scalar_one_or_none()
+    
+    if not roadmap:
+        raise HTTPException(status_code=404, detail="No roadmap found")
+        
+    # Fetch Milestones
+    milestones_result = await db.execute(
+        select(RoadmapMilestone).where(RoadmapMilestone.roadmap_id == roadmap.id)
+    )
+    milestones = milestones_result.scalars().all()
+    
+    # Construct Response
+    # Merge DB data (ID, status) with the content JSON (structure, descriptions)
+    # Note: Content JSON might be "stale" compared to DB milestones if we updated status
+    
+    roadmap_data = roadmap.content
+    
+    # Check if roadmap_data is nested in 'text' (legacy fix)
+    if "text" in roadmap_data and isinstance(roadmap_data["text"], str):
+         import json
+         try:
+             roadmap_data = json.loads(roadmap_data["text"])
+         except:
+             pass
+
+    if "milestones" not in roadmap_data:
+         # Fallback reconstruction if content is bad
+         roadmap_data["milestones"] = []
+
+    # Create a map of DB milestones for easy lookup
+    # We try to match by title first, or index if title fails
+    # Since generate creates them in order, index matching *should* be consistent if arrays align
+    
+    reconciled_milestones = []
+    
+    # We will prioritize DB milestones as source of truth for Status and ID
+    # and use JSON content for 'static' data (description, projects, etc) if available
+    
+    if milestones:
+        # Sort milestones by creation time or just assume list order matches if generated together
+        # Beware: UUID sort is random. We rely on insertion order usually being preserved in 'all()', but explicit sort is better.
+        # However, we don't have a reliable 'sequence_index' column yet.
+        # We will attempt to match by Title.
+        
+        db_milestones_map = {m.title: m for m in milestones}
+        
+        for ms_json in roadmap_data.get("milestones", []):
+            title = ms_json.get("title")
+            db_match = db_milestones_map.get(title)
+            
+            if db_match:
+                # Merge
+                ms_json["id"] = str(db_match.id)
+                ms_json["status"] = db_match.status
+                reconciled_milestones.append(ms_json)
+            else:
+                # Milestone in JSON but not in DB? Should not happen if sync is correct.
+                # Keep it but it has no ID -> Checkbox will fail.
+                logger.warning(f"Milestone '{title}' found in JSON but not in DB for roadmap {roadmap.id}")
+                reconciled_milestones.append(ms_json)
+    else:
+        # No DB milestones? Return JSON as is (will lack IDs)
+        reconciled_milestones = roadmap_data.get("milestones", [])
+        
+    roadmap_data["milestones"] = reconciled_milestones
+    
+    return {
+        "roadmap_id": roadmap.id,
+        "roadmap": roadmap_data
+    }
 
 class UpdateMilestoneRequest(BaseModel):
     status: MilestoneStatus
@@ -128,6 +217,7 @@ async def update_milestone_status(
     milestone = result.scalar_one_or_none()
     
     if not milestone:
+        logger.error(f"Milestone {milestone_id} not found in DB")
         raise HTTPException(status_code=404, detail="Milestone not found")
     
     milestone.status = request.status

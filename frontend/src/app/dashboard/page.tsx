@@ -156,6 +156,35 @@ const RoadmapTimeline = () => {
     const [generating, setGenerating] = useState(false);
     const router = useRouter();
 
+    const fetchLatestRoadmap = async () => {
+        try {
+            const res = await fetchClient("/roadmaps/latest");
+            if (res.ok) {
+                const data = await res.json();
+                console.log("Fetched latest roadmap:", data);
+                if (data.roadmap && data.roadmap.milestones) {
+                    setSteps(data.roadmap.milestones.map((m: any, index: number) => ({
+                        id: m.id || `milestone-MISSING-ID-${index}`,
+                        title: m.title,
+                        semester: m.semester,
+                        status: m.status || "Pending",
+                        desc: m.description,
+                        active: index === 0, // Logic for active needs refinement but keeping simple
+                        projects: m.projects,
+                        skills: m.skills,
+                        completed: m.status === "Done"
+                    })));
+                }
+            }
+        } catch (error) {
+            console.log("No existing roadmap found or error fetching.");
+        }
+    };
+
+    useEffect(() => {
+        fetchLatestRoadmap();
+    }, []);
+
     const handleLogout = () => {
         document.cookie = "token=; path=/; max-age=0";
 
@@ -209,7 +238,7 @@ const RoadmapTimeline = () => {
 
             if (roadmapData && roadmapData.milestones) {
                 const newSteps = roadmapData.milestones.map((m: any, index: number) => ({
-                    id: m.id || `milestone-${index}`,
+                    id: m.id || `milestone-MISSING-ID-${index}`,
                     title: m.title,
                     semester: m.semester,
                     status: m.status || "Planned",
@@ -238,6 +267,7 @@ const RoadmapTimeline = () => {
 
     const handleMilestoneToggle = async (milestoneId: string, isCompleted: boolean) => {
         try {
+            console.log("Updating Milestone ID:", milestoneId);
             const newStatus = isCompleted ? "Done" : "Pending";
 
             const res = await fetchClient(`/roadmaps/milestones/${milestoneId}`, {
