@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { fetchClient } from "@/lib/api";
+import { ThemeToggle } from "./ThemeToggle";
 
 export const Sidebar = () => {
     const [profile, setProfile] = useState<any>(null);
@@ -84,6 +85,9 @@ export const Sidebar = () => {
                 </div>
             </div>
             <div className="mt-auto p-6 space-y-4">
+                <div className="flex justify-center">
+                    <ThemeToggle />
+                </div>
                 <Button
                     variant="ghost"
                     onClick={handleLogout}
