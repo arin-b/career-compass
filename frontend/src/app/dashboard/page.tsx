@@ -340,7 +340,7 @@ const RoadmapTimeline = () => {
 
             <div className="flex-1 overflow-y-auto pr-6">
                 <motion.div
-                    className="max-w-4xl mx-auto"
+                    className="max-w-5xl mx-auto"
                     initial="hidden"
                     animate="visible"
                     variants={{

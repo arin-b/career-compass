@@ -172,9 +172,9 @@ export default function ProfilePage() {
                     </h1>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                    {/* Left Col: Avatar, Upload & Basic Info - Now spans 1 col but larger */}
-                    <div className="space-y-6 lg:col-span-1">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {/* Left Column: Avatar and Basic Info */}
+                    <div className="space-y-6">
 
                         {/* Avatar Card */}
                         <Card className="bg-white/80 dark:bg-gray-800/80 border-purple-200 dark:border-purple-800 shadow-xl backdrop-blur-sm flex flex-col items-center p-8 text-center rounded-2xl">
@@ -293,6 +293,10 @@ export default function ProfilePage() {
                             </CardContent>
                         </Card>
 
+                    </div>
+
+                    {/* Right Column: Major/GPA and Transcript */}
+                    <div className="space-y-6">
                         <Card className="bg-white/80 dark:bg-gray-800/80 border-yellow-200 dark:border-yellow-800 shadow-xl backdrop-blur-sm rounded-2xl">
                             <CardContent className="space-y-6 p-6">
                                 <div className="grid grid-cols-1 gap-6">
@@ -319,33 +323,73 @@ export default function ProfilePage() {
                                 </div>
                             </CardContent>
                         </Card>
+
+                        <Card className="bg-white/80 dark:bg-gray-800/80 border-green-200 dark:border-green-800 shadow-xl backdrop-blur-sm rounded-2xl">
+                            <CardHeader>
+                                <CardTitle className="text-gray-900 dark:text-white flex items-center gap-2 text-lg">
+                                    <FileText className="w-6 h-6 text-green-600 dark:text-green-400" /> Transcript
+                                </CardTitle>
+                                <CardDescription className="text-gray-600 dark:text-gray-400">Upload your PDF here</CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-6">
+                                {formData.transcript_metadata && formData.transcript_metadata.length > 0 && (
+                                    <div className="space-y-2 mb-4">
+                                        <p className="text-sm font-medium text-gray-300">Uploaded Files:</p>
+                                        <ul className="space-y-1">
+                                            {formData.transcript_metadata.map((file, idx) => (
+                                                <li key={idx} className="text-xs flex items-center gap-2 text-gray-400 bg-gray-950 p-2 rounded border border-gray-800">
+                                                    <FileText className="w-3 h-3 text-purple-400" />
+                                                    <span className="truncate">{file.name}</span>
+                                                    <span className="text-gray-600 ml-auto">{new Date(file.date).toLocaleDateString()}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+
+                                <div className="space-y-2">
+                                    <FileUpload
+                                        mode={formData.transcript_metadata.length > 0 ? "append" : "replace"}
+                                        onUploadSuccess={(txt) => {
+                                            toast.success("Transcript uploaded!");
+                                            window.location.reload();
+                                        }}
+                                    />
+                                </div>
+                            </CardContent>
+                        </Card>
                     </div>
-                    <div className="space-y-6 lg:col-span-3">
-                        <Card className="bg-white/80 dark:bg-gray-800/80 border-pink-200 dark:border-pink-800 shadow-xl backdrop-blur-sm rounded-2xl">
+                </div>
+
+                {/* Full Width: Interests & Activities */}
+                <div className="mt-8">
+                    <Card className="bg-white/80 dark:bg-gray-800/80 border-pink-200 dark:border-pink-800 shadow-xl backdrop-blur-sm rounded-2xl">
                             <CardHeader>
                                 <CardTitle className="text-gray-900 dark:text-white flex items-center gap-2 text-xl">
                                     <Sparkles className="w-6 h-6 text-yellow-500" /> Interests & Activities
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-8">
-                                <div className="space-y-4">
-                                    <label className="text-lg font-semibold text-gray-700 dark:text-gray-300">Hobbies</label>
-                                    <TagInput
-                                        placeholder="Type hobby and press Enter..."
-                                        value={formData.hobbies}
-                                        onChange={tags => setFormData({ ...formData, hobbies: tags })}
-                                    />
-                                    <p className="text-sm text-gray-500 dark:text-gray-400">e.g. Chess, Painting, Hiking</p>
-                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    <div className="space-y-4">
+                                        <label className="text-lg font-semibold text-gray-700 dark:text-gray-300">Hobbies</label>
+                                        <TagInput
+                                            placeholder="Type hobby and press Enter..."
+                                            value={formData.hobbies}
+                                            onChange={tags => setFormData({ ...formData, hobbies: tags })}
+                                        />
+                                        <p className="text-sm text-gray-500 dark:text-gray-400">e.g. Chess, Painting, Hiking</p>
+                                    </div>
 
-                                <div className="space-y-4">
-                                    <label className="text-lg font-semibold text-gray-700 dark:text-gray-300">Extracurriculars</label>
-                                    <TagInput
-                                        placeholder="Type activity and press Enter..."
-                                        value={formData.extracurriculars}
-                                        onChange={tags => setFormData({ ...formData, extracurriculars: tags })}
-                                    />
-                                    <p className="text-sm text-gray-500 dark:text-gray-400">e.g. Debate Club, Robotics Team</p>
+                                    <div className="space-y-4">
+                                        <label className="text-lg font-semibold text-gray-700 dark:text-gray-300">Extracurriculars</label>
+                                        <TagInput
+                                            placeholder="Type activity and press Enter..."
+                                            value={formData.extracurriculars}
+                                            onChange={tags => setFormData({ ...formData, extracurriculars: tags })}
+                                        />
+                                        <p className="text-sm text-gray-500 dark:text-gray-400">e.g. Debate Club, Robotics Team</p>
+                                    </div>
                                 </div>
 
                                 <div className="space-y-4">
