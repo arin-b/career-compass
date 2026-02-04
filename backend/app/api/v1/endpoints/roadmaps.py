@@ -181,23 +181,35 @@ async def get_latest_roadmap(
         # Sort milestones by creation time or just assume list order matches if generated together
         # Beware: UUID sort is random. We rely on insertion order usually being preserved in 'all()', but explicit sort is better.
         # However, we don't have a reliable 'sequence_index' column yet.
-        # We will attempt to match by Title.
+        # We will attempt to match by Title first, then by index as fallback.
         
         db_milestones_map = {m.title: m for m in milestones}
+        # Also create a list sorted by creation time for index fallback
+        sorted_db_milestones = sorted(milestones, key=lambda m: m.created_at)
         
-        for ms_json in roadmap_data.get("milestones", []):
+        logger.info(f"Matching {len(roadmap_data.get('milestones', []))} JSON milestones with {len(milestones)} DB milestones")
+        
+        for i, ms_json in enumerate(roadmap_data.get("milestones", [])):
             title = ms_json.get("title")
             db_match = db_milestones_map.get(title)
             
             if db_match:
-                # Merge
+                # Merge by title match
+                ms_json["id"] = str(db_match.id)
+                ms_json["status"] = db_match.status
+                reconciled_milestones.append(ms_json)
+                logger.info(f"Matched milestone '{title}' by title, assigned ID {db_match.id}")
+            elif i < len(sorted_db_milestones):
+                # Fallback: match by index if title match fails
+                db_match = sorted_db_milestones[i]
+                logger.warning(f"Milestone '{title}' matched by index {i} instead of title for roadmap {roadmap.id}, assigned ID {db_match.id}")
                 ms_json["id"] = str(db_match.id)
                 ms_json["status"] = db_match.status
                 reconciled_milestones.append(ms_json)
             else:
                 # Milestone in JSON but not in DB? Should not happen if sync is correct.
                 # Keep it but it has no ID -> Checkbox will fail.
-                logger.warning(f"Milestone '{title}' found in JSON but not in DB for roadmap {roadmap.id}")
+                logger.warning(f"Milestone '{title}' at index {i} found in JSON but not in DB for roadmap {roadmap.id}")
                 reconciled_milestones.append(ms_json)
     else:
         # No DB milestones? Return JSON as is (will lack IDs)

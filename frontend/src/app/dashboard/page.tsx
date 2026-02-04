@@ -268,6 +268,13 @@ const RoadmapTimeline = () => {
     }
 
     const handleMilestoneToggle = async (milestoneId: string, isCompleted: boolean) => {
+        // Check if milestoneId is a valid UUID, if not, show error
+        if (!milestoneId || milestoneId.startsWith('milestone-MISSING-ID-')) {
+            toast.error("This milestone cannot be updated. Please refresh the page and try again.");
+            console.error("Invalid milestone ID:", milestoneId);
+            return;
+        }
+
         try {
             console.log("Updating Milestone ID:", milestoneId);
             const newStatus = isCompleted ? "Done" : "Pending";
@@ -277,7 +284,11 @@ const RoadmapTimeline = () => {
                 body: JSON.stringify({ status: newStatus })
             });
 
-            if (!res.ok) throw new Error("Failed to update milestone");
+            if (!res.ok) {
+                const errorData = await res.json();
+                console.error("API Error:", errorData);
+                throw new Error("Failed to update milestone");
+            }
 
             setSteps(prevSteps =>
                 prevSteps.map(step =>
@@ -289,8 +300,11 @@ const RoadmapTimeline = () => {
 
             toast.success(isCompleted ? "Milestone completed! 🎉" : "Milestone unmarked");
 
+            // Refresh roadmap data to ensure UI is in sync
+            await fetchLatestRoadmap();
+
         } catch (error) {
-            console.error(error);
+            console.error("Error updating milestone:", error);
             toast.error("Failed to update milestone");
         }
     };
