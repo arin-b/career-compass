@@ -14,7 +14,7 @@ router = APIRouter()
 logger = get_logger()
 
 class GenerateRoadmapRequest(BaseModel):
-    user_id: uuid.UUID
+    pass  # No need for user_id, use current_user
 
 from app.api.deps import get_current_user
 
@@ -30,11 +30,13 @@ async def generate_roadmap(request: GenerateRoadmapRequest, db: AsyncSession = D
         raise HTTPException(status_code=404, detail="User not found")
 
     # Fetch Profile
-    profile_result = await db.execute(select(Profile).where(Profile.id == request.user_id))
+    profile_result = await db.execute(select(Profile).where(Profile.id == current_user.id))
     profile = profile_result.scalar_one_or_none()
     
     if not profile:
         raise HTTPException(status_code=400, detail="Profile not found. Please complete your profile first.")
+
+    logger.info(f"Profile data: manual_gpa={profile.manual_gpa}, manual_major={profile.manual_major}, hobbies={profile.hobbies}, extracurriculars={profile.extracurriculars}, bio={profile.bio}, additional_context={profile.additional_context}, transcript_summary={profile.transcript_summary[:100]}...")
 
     manual_data = {
         "manual_gpa": profile.manual_gpa,

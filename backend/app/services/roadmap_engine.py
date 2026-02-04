@@ -14,7 +14,7 @@ GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 def get_llm():
     if not GOOGLE_API_KEY:
         raise ValueError("GOOGLE_API_KEY not found")
-    return ChatGoogleGenerativeAI(model="gemini-flash-latest", google_api_key=GOOGLE_API_KEY, temperature=0.2)
+    return ChatGoogleGenerativeAI(model="gemini-flash-latest", google_api_key=GOOGLE_API_KEY, temperature=0)
 
 async def generate_career_roadmap(transcript_text: str, interests: List[str], manual_profile_data: Dict[str, Any] = None) -> Dict[str, Any]:
     """
@@ -46,11 +46,13 @@ async def generate_career_roadmap(transcript_text: str, interests: List[str], ma
     {transcript_text[:5000] if transcript_text else 'N/A'} 
     """
 
+    logger.info(f"USER PROFILE DATA: {user_profile_str}")
+
     system_prompt = """You are an expert Career Counselor AI.
     Your goal is to create a detailed, semester-by-semester career roadmap based on the COMPLETE user profile provided.
     
     CRITICAL INSTRUCTIONS:
-    1. **Holistic Analysis**: You MUST incorporate the 'USER'S SPECIFIC REQUEST' and 'PERSONAL PROFILE' into the roadmap.
+    1. **Holistic Analysis**: You MUST incorporate ALL details from the provided user profile, including manual major, GPA, hobbies, extracurriculars, bio, additional context, and transcript data.
     2. **Pivot Logic**: If the 'MANUAL TARGET MAJOR' or 'CRITICAL CONTEXT' indicates a desire to change fields (e.g., CS student wanting to be an Economist), YOU MUST PRIORITIZE THE USER'S GOAL over their transcript history. 
        - Create a roadmap for the new field.
        - Use the transcript only to identify transferable skills (math, logic, etc.).
@@ -79,6 +81,8 @@ async def generate_career_roadmap(transcript_text: str, interests: List[str], ma
     """
     
     user_input = f"""
+    Based on the following STUDENT CONTEXT, generate a personalized career roadmap JSON that incorporates all the provided details, including hobbies, extracurriculars, manual major, GPA, bio, additional context, and transcript data. Do not generate a generic roadmap; tailor it specifically to this student's profile.
+
     STUDENT CONTEXT:
     {user_profile_str}
     
