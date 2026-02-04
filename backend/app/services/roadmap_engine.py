@@ -49,7 +49,7 @@ async def generate_career_roadmap(transcript_text: str, interests: List[str], ma
 
     logger.info(f"USER PROFILE DATA: {user_profile_str}")
 
-    current_date = datetime.now().strftime("%B %d, %Y")
+    current_date = datetime.now().strftime("%B %d %Y")
     system_prompt = f"""
     Current Date: {current_date}
     You are an expert Career Counselor AI.
@@ -67,21 +67,8 @@ async def generate_career_roadmap(transcript_text: str, interests: List[str], ma
     Output:
     - Strictly valid JSON format.
     - No markdown formatting.
-    - The JSON must follow this structure:
-    {
-      "title": "Roadmap Title",
-      "summary": "Brief summary.",
-      "milestones": [
-        {
-          "semester": "Semester 1",
-          "title": "Title",
-          "description": "Desc.",
-          "status": "Upcoming",
-          "projects": ["Project 1", "Project 2"],
-          "skills": ["Skill 1", "Skill 2"]
-        }
-      ]
-    }
+    - The JSON must have these top-level keys: title (string), summary (string), milestones (array)
+    - Each milestone in the milestones array must have: semester (string), title (string), description (string), status (string), projects (array of strings), skills (array of strings)
     """
     
     user_input = f"""
