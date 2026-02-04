@@ -6,6 +6,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import SystemMessage, HumanMessage
 from app.core.logger import get_logger
 from app.core.json_utils import extract_json
+from datetime import datetime
 
 logger = get_logger()
 
@@ -48,7 +49,10 @@ async def generate_career_roadmap(transcript_text: str, interests: List[str], ma
 
     logger.info(f"USER PROFILE DATA: {user_profile_str}")
 
-    system_prompt = """You are an expert Career Counselor AI.
+    current_date = datetime.now().strftime("%B %d, %Y")
+    system_prompt = f"""
+    Current Date: {current_date}
+    You are an expert Career Counselor AI.
     Your goal is to create a detailed, semester-by-semester career roadmap based on the COMPLETE user profile provided.
     
     CRITICAL INSTRUCTIONS:
