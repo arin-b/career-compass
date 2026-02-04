@@ -56,18 +56,18 @@ const TimelineItem = ({
             className="relative pl-8 pb-6 border-l-2 border-gray-700/50 last:pb-0"
         >
             {/* Timeline dot */}
-            <div className={`absolute -left-[9px] top-0 w-4 h-4 rounded-full border-2 transition-all ${isChecked
-                ? 'bg-green-500 border-green-500 shadow-lg shadow-green-500/50'
+            <div className={`absolute -left-[13px] top-0 w-6 h-6 rounded-full border-4 transition-all shadow-lg ${isChecked
+                ? 'bg-green-500 border-green-200 shadow-green-500/50'
                 : active
-                    ? 'bg-purple-500 border-purple-500'
-                    : 'bg-gray-900 border-gray-500'
+                    ? 'bg-purple-500 border-purple-200 shadow-purple-500/50'
+                    : 'bg-gray-400 border-gray-200'
                 }`}></div>
 
             {/* Glassmorphism Card */}
             <div
-                className={`backdrop-blur-md rounded-xl p-4 transition-all duration-300 ${isChecked
-                    ? 'bg-green-500/10 border border-green-500/30 shadow-lg shadow-green-500/10'
-                    : 'bg-gray-800/40 border border-gray-700/50 hover:bg-gray-800/60 hover:border-gray-600/50'
+                className={`backdrop-blur-md rounded-2xl p-6 transition-all duration-300 shadow-xl ${isChecked
+                    ? 'bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/30 dark:to-emerald-900/30 border border-green-300 dark:border-green-700'
+                    : 'bg-white/70 dark:bg-gray-800/70 border border-gray-200 dark:border-gray-700 hover:bg-white/90 dark:hover:bg-gray-800/90'
                     }`}
             >
                 <div className="flex items-start gap-3">
@@ -86,25 +86,25 @@ const TimelineItem = ({
 
                     {/* Content */}
                     <div className="flex-1">
-                        <div className="mb-2">
-                            <span className="text-xs text-purple-400 font-mono mb-1 block">{semester}</span>
-                            <h4 className={`font-semibold text-lg transition-colors ${isChecked ? 'text-green-400 line-through' : active ? 'text-purple-400' : 'text-gray-200'
+                        <div className="mb-4">
+                            <span className="text-sm text-purple-600 dark:text-purple-400 font-mono mb-2 block bg-purple-100 dark:bg-purple-900/50 px-3 py-1 rounded-full inline-block">{semester}</span>
+                            <h4 className={`font-bold text-2xl transition-colors mb-2 ${isChecked ? 'text-green-600 dark:text-green-400 line-through' : active ? 'text-purple-600 dark:text-purple-400' : 'text-gray-800 dark:text-gray-200'
                                 }`}>
                                 {title}
                             </h4>
-                            <span className="text-xs uppercase tracking-wider text-gray-500 font-bold">{status}</span>
+                            <span className="text-sm uppercase tracking-wider text-gray-500 dark:text-gray-400 font-bold bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded-full">{status}</span>
                         </div>
 
-                        <p className="text-sm text-gray-400 mb-3">{desc}</p>
+                        <p className="text-base text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">{desc}</p>
 
                         {projects && projects.length > 0 && (
-                            <div className="mb-2">
-                                <h5 className="text-xs font-bold text-gray-500 uppercase mb-1.5">Key Projects</h5>
-                                <div className="flex flex-wrap gap-2">
+                            <div className="mb-4">
+                                <h5 className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase mb-3">Key Projects</h5>
+                                <div className="flex flex-wrap gap-3">
                                     {projects.map((p, i) => (
                                         <span
                                             key={i}
-                                            className="px-2 py-1 bg-gray-900/50 border border-gray-700/50 rounded text-xs text-gray-300 backdrop-blur-sm"
+                                            className="px-4 py-2 bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/50 dark:to-purple-900/50 border border-blue-200 dark:border-blue-700 rounded-xl text-sm text-gray-800 dark:text-gray-200 shadow-sm"
                                         >
                                             {p}
                                         </span>
@@ -115,10 +115,10 @@ const TimelineItem = ({
 
                         {skills && skills.length > 0 && (
                             <div>
-                                <h5 className="text-xs font-bold text-gray-500 uppercase mb-1.5">Skills</h5>
-                                <div className="flex flex-wrap gap-1.5">
+                                <h5 className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase mb-3">Skills</h5>
+                                <div className="flex flex-wrap gap-2">
                                     {skills.map((s, i) => (
-                                        <span key={i} className="text-xs text-purple-400/80">#{s}</span>
+                                        <span key={i} className="text-sm text-purple-600 dark:text-purple-400 font-medium"># {s}</span>
                                     ))}
                                 </div>
                             </div>
@@ -134,18 +134,20 @@ const ProgressBar = ({ completed, total }: { completed: number; total: number })
     const percentage = total > 0 ? (completed / total) * 100 : 0;
 
     return (
-        <div className="mb-6">
-            <div className="flex justify-between mb-2">
-                <span className="text-sm font-semibold text-gray-300">Overall Progress</span>
-                <span className="text-sm text-purple-400">{completed} / {total} completed</span>
+        <div className="mb-8">
+            <div className="flex justify-between mb-4">
+                <span className="text-xl font-bold text-gray-800 dark:text-gray-200">Overall Progress</span>
+                <span className="text-xl text-purple-600 dark:text-purple-400 font-semibold">{completed} / {total} completed</span>
             </div>
-            <div className="w-full bg-gray-800/50 rounded-full h-3 overflow-hidden backdrop-blur-sm border border-gray-700/50">
+            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-6 overflow-hidden shadow-inner border border-gray-300 dark:border-gray-600">
                 <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${percentage}%` }}
-                    transition={{ duration: 0.5, ease: "easeOut" }}
-                    className="h-full bg-gradient-to-r from-purple-500 to-green-500 rounded-full shadow-lg shadow-purple-500/50"
-                />
+                    transition={{ duration: 0.8, ease: "easeOut" }}
+                    className="h-full bg-gradient-to-r from-purple-500 via-blue-500 to-green-500 rounded-full shadow-lg relative"
+                >
+                    <div className="absolute inset-0 bg-white/20 rounded-full animate-pulse"></div>
+                </motion.div>
             </div>
         </div>
     );
@@ -296,47 +298,49 @@ const RoadmapTimeline = () => {
     const completedCount = steps.filter((step: any) => step.completed).length;
 
     return (
-        <div className="flex-1 p-8 bg-gray-950 text-white overflow-hidden flex flex-col h-screen">
-            <div className="flex justify-between items-center mb-6 shrink-0">
+        <div className="flex-1 p-8 bg-gradient-to-br from-gray-50 via-purple-50 to-blue-50 dark:from-gray-900 dark:via-purple-900/10 dark:to-blue-900/10 text-gray-900 dark:text-white overflow-hidden flex flex-col h-screen">
+            <div className="flex justify-between items-center mb-8 shrink-0">
                 <div>
-                    <h1 className="text-3xl font-bold">Your Roadmap</h1>
-                    <p className="text-gray-400">Generated based on your interest in "Software Engineering"</p>
+                    <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-blue-600 to-green-600 dark:from-purple-400 dark:via-blue-400 dark:to-green-400">Your Roadmap</h1>
+                    <p className="text-lg text-gray-600 dark:text-gray-400 mt-2">Generated based on your unique profile and interests</p>
                 </div>
-                <div className="flex gap-4">
+                <div className="flex gap-6">
                     <Button
                         onClick={() => handleGenerate(false)}
                         disabled={generating}
-                        className="bg-purple-600 hover:bg-purple-700 text-white gap-2"
+                        className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-xl shadow-purple-500/30 px-8 py-3 text-lg rounded-xl"
                     >
-                        {generating ? <Sparkles className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                        {generating ? <Sparkles className="w-5 h-5 animate-spin mr-2" /> : <Sparkles className="w-5 h-5 mr-2" />}
                         {generating ? "Generating..." : "Generate with AI"}
                     </Button>
                     <Button
                         variant="outline"
                         onClick={handleLogout}
-                        className="border-red-500/50 text-red-400 hover:bg-red-500/10 hover:text-red-300 gap-2"
+                        className="border-2 border-red-300 dark:border-red-700 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 px-8 py-3 text-lg rounded-xl"
                     >
-                        <LogOut className="w-4 h-4" />
+                        <LogOut className="w-5 h-5 mr-2" />
                         Logout
                     </Button>
                 </div>
             </div>
 
-            <div className="mb-6 p-4 bg-purple-900/20 border border-purple-500/30 rounded-lg flex items-center justify-between">
-                <div>
-                    <h3 className="font-semibold text-purple-200">Want better recommendations?</h3>
-                    <p className="text-sm text-gray-400">Update your profile with new hobbies or transcripts.</p>
+            <div className="mb-8 p-6 bg-gradient-to-r from-purple-100 to-blue-100 dark:from-purple-900/30 dark:to-blue-900/30 border border-purple-200 dark:border-purple-800 rounded-2xl shadow-lg">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h3 className="font-bold text-xl text-purple-800 dark:text-purple-200">Want better recommendations?</h3>
+                        <p className="text-gray-600 dark:text-gray-300 mt-1">Update your profile with new hobbies or transcripts for personalized results.</p>
+                    </div>
+                    <Button onClick={() => router.push("/profile")} variant="outline" className="border-purple-400 text-purple-700 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-800 px-6 py-2 rounded-xl">
+                        Go to Profile
+                    </Button>
                 </div>
-                <Button onClick={() => router.push("/profile")} variant="outline" className="border-purple-500 text-purple-400 hover:bg-purple-500 hover:text-white">
-                    Go to Profile
-                </Button>
             </div>
 
             <ProgressBar completed={completedCount} total={steps.length} />
 
-            <div className="flex-1 overflow-y-auto pr-4">
+            <div className="flex-1 overflow-y-auto pr-6">
                 <motion.div
-                    className="max-w-2xl"
+                    className="max-w-4xl mx-auto"
                     initial="hidden"
                     animate="visible"
                     variants={{
@@ -416,27 +420,27 @@ const ChatInterface = () => {
     }
 
     return (
-        <div className={`transition-all duration-300 ease-in-out border-l border-gray-800 bg-gray-900 h-full flex flex-col ${isOpen ? 'w-96' : 'w-12'}`}>
-            <div className="p-4 border-b border-gray-800 flex justify-between items-center">
+        <div className={`transition-all duration-300 ease-in-out border-l border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 h-full flex flex-col backdrop-blur-md ${isOpen ? 'w-96' : 'w-12'}`}>
+            <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center bg-gradient-to-r from-purple-100 to-blue-100 dark:from-purple-900/50 dark:to-blue-900/50">
                 {isOpen && (
-                    <div className="flex items-center gap-2 font-semibold text-white">
-                        <Sparkles className="w-4 h-4 text-purple-400" />
+                    <div className="flex items-center gap-3 font-bold text-xl text-gray-800 dark:text-gray-200">
+                        <Sparkles className="w-6 h-6 text-purple-600 dark:text-purple-400" />
                         <span>AI Assistant</span>
                     </div>
                 )}
-                <Button variant="ghost" size="icon" onClick={() => setIsOpen(!isOpen)} className="text-gray-400 h-6 w-6">
-                    {isOpen ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+                <Button variant="ghost" size="icon" onClick={() => setIsOpen(!isOpen)} className="text-gray-600 dark:text-gray-400 h-8 w-8 hover:bg-gray-200 dark:hover:bg-gray-700">
+                    {isOpen ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
                 </Button>
             </div>
 
             {isOpen && (
                 <>
-                    <div className="flex-1 overflow-y-auto p-4 space-y-4" ref={scrollRef}>
+                    <div className="flex-1 overflow-y-auto p-6 space-y-4" ref={scrollRef}>
                         {messages.map((m, i) => (
                             <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                                <div className={`max-w-[85%] rounded-lg p-3 text-sm ${m.role === 'user'
-                                    ? 'bg-purple-600 text-white'
-                                    : 'bg-gray-800 text-gray-200 border border-gray-700'
+                                <div className={`max-w-[85%] rounded-2xl p-4 text-sm shadow-lg ${m.role === 'user'
+                                    ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white'
+                                    : 'bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-600'
                                     }`}>
                                     {m.content}
                                 </div>
@@ -444,25 +448,25 @@ const ChatInterface = () => {
                         ))}
                         {loading && (
                             <div className="flex justify-start">
-                                <div className="bg-gray-800 rounded-lg p-3 text-sm flex gap-1 items-center">
-                                    <span className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></span>
-                                    <span className="w-2 h-2 bg-gray-500 rounded-full animate-bounce delay-75"></span>
-                                    <span className="w-2 h-2 bg-gray-500 rounded-full animate-bounce delay-150"></span>
+                                <div className="bg-white dark:bg-gray-700 rounded-2xl p-4 text-sm flex gap-2 items-center shadow-lg border border-gray-200 dark:border-gray-600">
+                                    <span className="w-3 h-3 bg-purple-500 rounded-full animate-bounce"></span>
+                                    <span className="w-3 h-3 bg-blue-500 rounded-full animate-bounce delay-75"></span>
+                                    <span className="w-3 h-3 bg-green-500 rounded-full animate-bounce delay-150"></span>
                                 </div>
                             </div>
                         )}
                     </div>
-                    <div className="p-4 border-t border-gray-800">
-                        <div className="flex gap-2">
+                    <div className="p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+                        <div className="flex gap-3">
                             <Input
                                 placeholder="Ask about your career..."
-                                className="bg-gray-950 border-gray-700 text-white focus-visible:ring-purple-500"
+                                className="bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus-visible:ring-purple-500 rounded-xl h-12 text-base"
                                 value={input}
                                 onChange={e => setInput(e.target.value)}
                                 onKeyDown={e => e.key === 'Enter' && sendMessage()}
                             />
-                            <Button size="icon" className="bg-purple-600 hover:bg-purple-700" onClick={sendMessage}>
-                                <Send size={16} />
+                            <Button size="icon" className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white shadow-lg h-12 w-12 rounded-xl" onClick={sendMessage}>
+                                <Send size={20} />
                             </Button>
                         </div>
                     </div>
@@ -474,7 +478,7 @@ const ChatInterface = () => {
 
 export default function Dashboard() {
     return (
-        <div className="flex h-screen bg-black overflow-hidden font-sans">
+        <div className="flex h-screen bg-gradient-to-br from-gray-50 via-purple-50 to-blue-50 dark:from-gray-900 dark:via-purple-900/10 dark:to-blue-900/10 overflow-hidden font-sans">
             <Sidebar />
             <RoadmapTimeline />
             <ChatInterface />

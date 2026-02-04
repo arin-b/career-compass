@@ -160,32 +160,32 @@ export default function ProfilePage() {
     if (loading) return <div className="h-screen bg-black text-white flex items-center justify-center">Loading Profile...</div>;
 
     return (
-        <div className="min-h-screen bg-black text-white p-8 font-sans">
-            <div className="max-w-4xl mx-auto space-y-8">
+        <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-green-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-blue-900/20 text-gray-900 dark:text-white p-8 font-sans">
+            <div className="max-w-7xl mx-auto space-y-8">
                 {/* Header */}
                 <div className="flex items-center gap-4">
-                    <Button variant="ghost" onClick={() => router.push("/dashboard")} className="text-gray-400 hover:text-white">
+                    <Button variant="ghost" onClick={() => router.push("/dashboard")} className="text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400">
                         <ArrowLeft className="w-5 h-5 mr-2" /> Back to Dashboard
                     </Button>
-                    <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
+                    <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-blue-600 to-green-600 dark:from-purple-400 dark:via-blue-400 dark:to-green-400">
                         Your Profile
                     </h1>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    {/* Left Col: Avatar, Upload & Basic Info */}
-                    <div className="space-y-6 md:col-span-1">
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                    {/* Left Col: Avatar, Upload & Basic Info - Now spans 1 col but larger */}
+                    <div className="space-y-6 lg:col-span-1">
 
                         {/* Avatar Card */}
-                        <Card className="bg-gray-900 border-gray-800 flex flex-col items-center p-6 text-center">
-                            <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-purple-500/30 mb-4 bg-gray-800 items-center justify-center flex">
+                        <Card className="bg-white/80 dark:bg-gray-800/80 border-purple-200 dark:border-purple-800 shadow-xl backdrop-blur-sm flex flex-col items-center p-8 text-center rounded-2xl">
+                            <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-gradient-to-r from-purple-500 to-blue-500 mb-6 bg-gradient-to-br from-purple-100 to-blue-100 dark:from-gray-700 dark:to-gray-600 items-center justify-center flex shadow-lg">
                                 {formData.avatar_base64 ? (
                                     <img src={formData.avatar_base64} alt="Avatar" className="w-full h-full object-cover" />
                                 ) : (
-                                    <User className="w-12 h-12 text-gray-500" />
+                                    <User className="w-16 h-16 text-gray-400 dark:text-gray-500" />
                                 )}
                             </div>
-                            <label className="cursor-pointer text-sm font-medium text-purple-400 hover:text-purple-300 transition-colors">
+                            <label className="cursor-pointer text-lg font-semibold text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors">
                                 Change Photo
                                 <input
                                     type="file"
@@ -194,30 +194,30 @@ export default function ProfilePage() {
                                     onChange={handleImageUpload}
                                 />
                             </label>
-                            <span className="text-xs text-gray-500 mt-1">Max 200KB</span>
+                            <span className="text-sm text-gray-500 dark:text-gray-400 mt-2">Max 200KB</span>
                         </Card>
 
-                        <Card className="bg-gray-900 border-gray-800">
+                        <Card className="bg-white/80 dark:bg-gray-800/80 border-blue-200 dark:border-blue-800 shadow-xl backdrop-blur-sm rounded-2xl">
                             <CardHeader>
-                                <CardTitle className="text-white flex items-center gap-2 text-base">
+                                <CardTitle className="text-gray-900 dark:text-white flex items-center gap-2 text-lg">
                                     Identity
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent className="space-y-4">
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium text-gray-300">Display Name</label>
+                            <CardContent className="space-y-6">
+                                <div className="space-y-3">
+                                    <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Display Name</label>
                                     <Input
                                         placeholder="Alex Hamilton"
-                                        className="bg-gray-950 border-gray-700 text-white"
+                                        className="bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-xl h-12 text-lg"
                                         value={formData.display_name}
                                         onChange={e => setFormData({ ...formData, display_name: e.target.value })}
                                     />
                                 </div>
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium text-gray-300">Personal Bio</label>
+                                <div className="space-y-3">
+                                    <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Personal Bio</label>
                                     <Textarea
                                         placeholder="Tell us about your goals..."
-                                        className="bg-gray-950 border-gray-700 text-white min-h-[100px]"
+                                        className="bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-xl min-h-[120px] text-lg"
                                         value={formData.bio}
                                         onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData({ ...formData, bio: e.target.value })}
                                     />
@@ -225,14 +225,14 @@ export default function ProfilePage() {
                             </CardContent>
                         </Card>
 
-                        <Card className="bg-gray-900 border-gray-800">
+                        <Card className="bg-white/80 dark:bg-gray-800/80 border-green-200 dark:border-green-800 shadow-xl backdrop-blur-sm rounded-2xl">
                             <CardHeader>
-                                <CardTitle className="text-white flex items-center gap-2">
-                                    <FileText className="w-5 h-5 text-purple-400" /> Transcript
+                                <CardTitle className="text-gray-900 dark:text-white flex items-center gap-2 text-lg">
+                                    <FileText className="w-6 h-6 text-green-600 dark:text-green-400" /> Transcript
                                 </CardTitle>
-                                <CardDescription className="text-gray-400">Upload your PDF here</CardDescription>
+                                <CardDescription className="text-gray-600 dark:text-gray-400">Upload your PDF here</CardDescription>
                             </CardHeader>
-                            <CardContent className="space-y-4">
+                            <CardContent className="space-y-6">
                                 {formData.transcript_metadata && formData.transcript_metadata.length > 0 && (
                                     <div className="space-y-2 mb-4">
                                         <p className="text-sm font-medium text-gray-300">Uploaded Files:</p>
@@ -293,25 +293,25 @@ export default function ProfilePage() {
                             </CardContent>
                         </Card>
 
-                        <Card className="bg-gray-900 border-gray-800">
-                            <CardContent className="space-y-4">
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium text-gray-300">Major</label>
+                        <Card className="bg-white/80 dark:bg-gray-800/80 border-yellow-200 dark:border-yellow-800 shadow-xl backdrop-blur-sm rounded-2xl">
+                            <CardContent className="space-y-6 p-6">
+                                <div className="grid grid-cols-1 gap-6">
+                                    <div className="space-y-3">
+                                        <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Major</label>
                                         <Input
                                             placeholder="e.g. Computer Science"
-                                            className="bg-gray-950 border-gray-700 text-white"
+                                            className="bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-xl h-12 text-lg"
                                             value={formData.manual_major}
                                             onChange={e => setFormData({ ...formData, manual_major: e.target.value })}
                                         />
                                     </div>
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium text-gray-300">GPA</label>
+                                    <div className="space-y-3">
+                                        <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">GPA</label>
                                         <Input
                                             type="number"
                                             step="0.01"
                                             placeholder="e.g. 3.8"
-                                            className="bg-gray-950 border-gray-700 text-white"
+                                            className="bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-xl h-12 text-lg"
                                             value={formData.manual_gpa}
                                             onChange={e => setFormData({ ...formData, manual_gpa: e.target.value })}
                                         />
@@ -320,39 +320,39 @@ export default function ProfilePage() {
                             </CardContent>
                         </Card>
                     </div>
-                    <div className="space-y-6 md:col-span-2">
-                        <Card className="bg-gray-900 border-gray-800">
+                    <div className="space-y-6 lg:col-span-3">
+                        <Card className="bg-white/80 dark:bg-gray-800/80 border-pink-200 dark:border-pink-800 shadow-xl backdrop-blur-sm rounded-2xl">
                             <CardHeader>
-                                <CardTitle className="text-white flex items-center gap-2">
-                                    <Sparkles className="w-5 h-5 text-yellow-400" /> Interests & Activities
+                                <CardTitle className="text-gray-900 dark:text-white flex items-center gap-2 text-xl">
+                                    <Sparkles className="w-6 h-6 text-yellow-500" /> Interests & Activities
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent className="space-y-6">
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium text-gray-300">Hobbies</label>
+                            <CardContent className="space-y-8">
+                                <div className="space-y-4">
+                                    <label className="text-lg font-semibold text-gray-700 dark:text-gray-300">Hobbies</label>
                                     <TagInput
                                         placeholder="Type hobby and press Enter..."
                                         value={formData.hobbies}
                                         onChange={tags => setFormData({ ...formData, hobbies: tags })}
                                     />
-                                    <p className="text-xs text-gray-500">e.g. Chess, Painting, Hiking</p>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">e.g. Chess, Painting, Hiking</p>
                                 </div>
 
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium text-gray-300">Extracurriculars</label>
+                                <div className="space-y-4">
+                                    <label className="text-lg font-semibold text-gray-700 dark:text-gray-300">Extracurriculars</label>
                                     <TagInput
                                         placeholder="Type activity and press Enter..."
                                         value={formData.extracurriculars}
                                         onChange={tags => setFormData({ ...formData, extracurriculars: tags })}
                                     />
-                                    <p className="text-xs text-gray-500">e.g. Debate Club, Robotics Team</p>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">e.g. Debate Club, Robotics Team</p>
                                 </div>
 
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium text-gray-300">Additional Context</label>
+                                <div className="space-y-4">
+                                    <label className="text-lg font-semibold text-gray-700 dark:text-gray-300">Additional Context</label>
                                     <Textarea
                                         placeholder="Is there anything else you want to tell us? (Specific career goals, constraints, dreams, etc.)"
-                                        className="bg-gray-950 border-gray-700 text-white min-h-[100px]"
+                                        className="bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-xl min-h-[150px] text-lg"
                                         value={formData.additional_context}
                                         onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData({ ...formData, additional_context: e.target.value })}
                                     />
@@ -361,21 +361,21 @@ export default function ProfilePage() {
                         </Card>
 
                         {/* Actions */}
-                        <div className="flex justify-end gap-4 pt-4">
+                        <div className="flex justify-end gap-6 pt-6">
                             <Button
                                 variant="outline"
                                 onClick={() => handleSave(false)}
                                 disabled={saving}
-                                className="border-gray-700 text-gray-300 hover:text-white"
+                                className="border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 px-8 py-3 text-lg rounded-xl"
                             >
-                                <Save className="w-4 h-4 mr-2" /> Save Changes
+                                <Save className="w-5 h-5 mr-2" /> Save Changes
                             </Button>
                             <Button
                                 onClick={() => handleSave(true)}
                                 disabled={saving}
-                                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg shadow-purple-500/20"
+                                className="bg-gradient-to-r from-purple-600 via-blue-600 to-green-600 hover:from-purple-700 hover:via-blue-700 hover:to-green-700 text-white shadow-xl shadow-purple-500/30 px-8 py-3 text-lg rounded-xl"
                             >
-                                {saving ? <Sparkles className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
+                                {saving ? <Sparkles className="w-5 h-5 mr-2 animate-spin" /> : <Sparkles className="w-5 h-5 mr-2" />}
                                 Save & Recalculate Roadmap
                             </Button>
                         </div>
