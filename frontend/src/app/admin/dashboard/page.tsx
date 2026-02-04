@@ -91,6 +91,18 @@ export default function AdminDashboard() {
 
     if (!isAdmin) return null; // Or a loading spinner
 
+    if (loading) {
+        return (
+            <div className="flex h-screen bg-black text-white items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-red-500 mx-auto mb-4"></div>
+                    <h2 className="text-2xl font-bold mb-2">Loading Admin Dashboard</h2>
+                    <p className="text-gray-400">Fetching user data...</p>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="flex h-screen bg-black overflow-hidden font-sans text-white">
             <Sidebar />

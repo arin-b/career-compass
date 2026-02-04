@@ -156,6 +156,7 @@ const ProgressBar = ({ completed, total }: { completed: number; total: number })
 const RoadmapTimeline = () => {
     const [steps, setSteps] = useState<any[]>([]);
     const [generating, setGenerating] = useState(false);
+    const [loading, setLoading] = useState(true);
     const router = useRouter();
 
     const fetchLatestRoadmap = async () => {
@@ -180,6 +181,8 @@ const RoadmapTimeline = () => {
             }
         } catch (error) {
             console.log("No existing roadmap found or error fetching.");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -310,6 +313,18 @@ const RoadmapTimeline = () => {
     };
 
     const completedCount = steps.filter((step: any) => step.completed).length;
+
+    if (loading) {
+        return (
+            <div className="flex-1 p-8 bg-gradient-to-br from-gray-50 via-purple-50 to-blue-50 dark:from-gray-900 dark:via-purple-900/10 dark:to-blue-900/10 text-gray-900 dark:text-white overflow-hidden flex flex-col h-screen items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-purple-600 mx-auto mb-4"></div>
+                    <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">Loading Your Roadmap</h2>
+                    <p className="text-gray-600 dark:text-gray-400">Fetching your personalized career path...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="flex-1 p-8 bg-gradient-to-br from-gray-50 via-purple-50 to-blue-50 dark:from-gray-900 dark:via-purple-900/10 dark:to-blue-900/10 text-gray-900 dark:text-white overflow-hidden flex flex-col h-screen">

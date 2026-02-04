@@ -11,11 +11,13 @@ import { ThemeToggle } from "./ThemeToggle";
 
 export const Sidebar = () => {
     const [profile, setProfile] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
     const router = useRouter();
 
     useEffect(() => {
         fetchClient("/users/profile").then(async res => {
             if (res.ok) setProfile(await res.json());
+            setLoading(false);
         });
     }, []);
 
@@ -30,6 +32,17 @@ export const Sidebar = () => {
         toast.success("Logged out successfully.");
         router.push("/login");
     };
+
+    if (loading) {
+        return (
+            <div className="w-72 bg-gradient-to-b from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 text-gray-900 dark:text-white flex flex-col h-full border-r border-gray-200 dark:border-gray-700 shrink-0 shadow-xl items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-4"></div>
+                    <p className="text-gray-600 dark:text-gray-400">Loading profile...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="w-72 bg-gradient-to-b from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 text-gray-900 dark:text-white flex flex-col h-full border-r border-gray-200 dark:border-gray-700 shrink-0 shadow-xl">
