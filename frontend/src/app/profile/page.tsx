@@ -177,7 +177,7 @@ export default function ProfilePage() {
                     <div className="space-y-6">
 
                         {/* Avatar Card */}
-                        <Card className="bg-white/80 dark:bg-gray-800/80 border-purple-200 dark:border-purple-800 shadow-xl backdrop-blur-sm flex flex-col items-center p-8 text-center rounded-2xl">
+                        <Card className="bg-white/80 dark:bg-gray-800/80 border-purple-200 dark:border-purple-800 shadow-xl backdrop-blur-sm flex flex-col items-center p-8 text-center rounded-2xl min-h-[320px]">
                             <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-gradient-to-r from-purple-500 to-blue-500 mb-6 bg-gradient-to-br from-purple-100 to-blue-100 dark:from-gray-700 dark:to-gray-600 items-center justify-center flex shadow-lg">
                                 {formData.avatar_base64 ? (
                                     <img src={formData.avatar_base64} alt="Avatar" className="w-full h-full object-cover" />
@@ -197,7 +197,7 @@ export default function ProfilePage() {
                             <span className="text-sm text-gray-500 dark:text-gray-400 mt-2">Max 200KB</span>
                         </Card>
 
-                        <Card className="bg-white/80 dark:bg-gray-800/80 border-blue-200 dark:border-blue-800 shadow-xl backdrop-blur-sm rounded-2xl">
+                        <Card className="bg-white/80 dark:bg-gray-800/80 border-blue-200 dark:border-blue-800 shadow-xl backdrop-blur-sm rounded-2xl min-h-[320px]">
                             <CardHeader>
                                 <CardTitle className="text-gray-900 dark:text-white flex items-center gap-2 text-lg">
                                     Identity
@@ -225,79 +225,11 @@ export default function ProfilePage() {
                             </CardContent>
                         </Card>
 
-                        <Card className="bg-white/80 dark:bg-gray-800/80 border-green-200 dark:border-green-800 shadow-xl backdrop-blur-sm rounded-2xl">
-                            <CardHeader>
-                                <CardTitle className="text-gray-900 dark:text-white flex items-center gap-2 text-lg">
-                                    <FileText className="w-6 h-6 text-green-600 dark:text-green-400" /> Transcript
-                                </CardTitle>
-                                <CardDescription className="text-gray-600 dark:text-gray-400">Upload your PDF here</CardDescription>
-                            </CardHeader>
-                            <CardContent className="space-y-6">
-                                {formData.transcript_metadata && formData.transcript_metadata.length > 0 && (
-                                    <div className="space-y-2 mb-4">
-                                        <p className="text-sm font-medium text-gray-300">Uploaded Files:</p>
-                                        <ul className="space-y-1">
-                                            {formData.transcript_metadata.map((file, idx) => (
-                                                <li key={idx} className="text-xs flex items-center gap-2 text-gray-400 bg-gray-950 p-2 rounded border border-gray-800">
-                                                    <FileText className="w-3 h-3 text-purple-400" />
-                                                    <span className="truncate">{file.name}</span>
-                                                    <span className="text-gray-600 ml-auto">{new Date(file.date).toLocaleDateString()}</span>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                )}
-
-                                <div className="space-y-2">
-                                    <FileUpload
-                                        mode={formData.transcript_metadata.length > 0 ? "append" : "replace"}
-                                        onUploadSuccess={(txt) => {
-                                            toast.success("Transcript uploaded!");
-                                            // Reload profile to get updated metadata
-                                            // For now just quick hack, user should save or reload.
-                                            // Actually best to trigger a reload or update state manually if API returned metadata?
-                                            // The hook relies on 'loadProfile'. We can just trigger a reload.
-                                            window.location.reload();
-                                        }}
-                                    />
-                                    {formData.transcript_metadata.length > 0 && (
-                                        <div className="flex justify-between items-center text-xs text-gray-500 px-1">
-                                            <span>Current Mode: <strong>{formData.transcript_metadata.length > 0 ? "Append (Add to list)" : "Replace"}</strong></span>
-                                            <button
-                                                onClick={async () => {
-                                                    if (confirm("Clear all transcripts and upload fresh?")) {
-                                                        // This requires a clear endpoint or just uploading with 'replace'.
-                                                        // Since we don't have a clear endpoint yet, we just instruct user.
-                                                        // Actually, we can force the next upload to be 'replace' if we had a state for mode.
-                                                        // But complying with user request: 'Upload New (Replace All)' button.
-                                                        // The FileUpload above defaults to Append if files exist.
-                                                        // Let's add explicit buttons below.
-                                                    }
-                                                }}
-                                                className="hover:text-red-400 hidden" // hidden for now
-                                            >
-                                                Reset
-                                            </button>
-                                        </div>
-                                    )}
-
-                                    {formData.transcript_metadata.length > 0 && (
-                                        <div className="grid grid-cols-2 gap-2 mt-2">
-                                            <div className="text-[10px] text-gray-500 text-center">
-                                                To Replace All: Clear via Backend or just ignore.
-                                                (Wait, user asked for explicit buttons).
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            </CardContent>
-                        </Card>
-
                     </div>
 
                     {/* Right Column: Major/GPA and Transcript */}
                     <div className="space-y-6">
-                        <Card className="bg-white/80 dark:bg-gray-800/80 border-yellow-200 dark:border-yellow-800 shadow-xl backdrop-blur-sm rounded-2xl">
+                        <Card className="bg-white/80 dark:bg-gray-800/80 border-yellow-200 dark:border-yellow-800 shadow-xl backdrop-blur-sm rounded-2xl min-h-[320px]">
                             <CardContent className="space-y-6 p-6">
                                 <div className="grid grid-cols-1 gap-6">
                                     <div className="space-y-3">
@@ -324,7 +256,7 @@ export default function ProfilePage() {
                             </CardContent>
                         </Card>
 
-                        <Card className="bg-white/80 dark:bg-gray-800/80 border-green-200 dark:border-green-800 shadow-xl backdrop-blur-sm rounded-2xl">
+                        <Card className="bg-white/80 dark:bg-gray-800/80 border-green-200 dark:border-green-800 shadow-xl backdrop-blur-sm rounded-2xl min-h-[320px]">
                             <CardHeader>
                                 <CardTitle className="text-gray-900 dark:text-white flex items-center gap-2 text-lg">
                                     <FileText className="w-6 h-6 text-green-600 dark:text-green-400" /> Transcript
