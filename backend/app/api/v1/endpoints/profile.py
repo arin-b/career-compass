@@ -4,6 +4,10 @@ from sqlalchemy import select
 from app.api.deps import get_db, get_current_user
 from app.models.models import User, Profile
 from app.schemas.profile import ProfileUpdate, ProfileResponse
+from pydantic import BaseModel
+
+class DeleteTranscriptRequest(BaseModel):
+    filename: str
 
 router = APIRouter()
 
@@ -70,3 +74,33 @@ async def get_profile(
         "avatar_base64": current_user.avatar_base64,
         "role": current_user.role
     }
+
+@router.delete("/transcript")
+async def delete_transcript(
+    request: DeleteTranscriptRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    result = await db.execute(select(Profile).where(Profile.id == current_user.id))
+    profile = result.scalar_one_or_none()
+    
+    if not profile:
+        raise HTTPException(status_code=404, detail="Profile not found")
+    
+    if not profile.transcript_metadata:
+        raise HTTPException(status_code=404, detail="No transcripts found")
+    
+    # Find and remove the transcript metadata
+    original_length = len(profile.transcript_metadata)
+    profile.transcript_metadata = [
+        meta for meta in profile.transcript_metadata 
+        if meta.get("name") != request.filename
+    ]
+    
+    if len(profile.transcript_metadata) == original_length:
+        raise HTTPException(status_code=404, detail="Transcript not found")
+    
+    db.add(profile)
+    await db.commit()
+    
+    return {"message": "Transcript deleted successfully"}

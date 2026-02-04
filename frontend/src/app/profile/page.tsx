@@ -10,7 +10,15 @@ import { TagInput } from "@/components/ui/tag-input";
 import { FileUpload } from "@/components/file-upload";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Save, Sparkles, User, GraduationCap, FileText, Plus, RefreshCw } from "lucide-react";
+import { ArrowLeft, Save, Sparkles, User, GraduationCap, FileText, Plus, RefreshCw, X } from "lucide-react";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
 
 const UploadSection = ({ hasFiles, onSuccess }: { hasFiles: boolean, onSuccess: () => void }) => {
     const [mode, setMode] = useState<"replace" | "append">(hasFiles ? "append" : "replace");
@@ -67,6 +75,9 @@ export default function ProfilePage() {
         transcript_metadata: [] as { name: string, date: string }[]
     });
 
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [transcriptToDelete, setTranscriptToDelete] = useState<string | null>(null);
+
     useEffect(() => {
         const loadProfile = async () => {
             try {
@@ -114,6 +125,36 @@ export default function ProfilePage() {
             setFormData(prev => ({ ...prev, avatar_base64: base64String }));
         };
         reader.readAsDataURL(file);
+    };
+
+    const handleDeleteTranscript = async () => {
+        if (!transcriptToDelete) return;
+
+        try {
+            const res = await fetchClient("/users/profile/transcript", {
+                method: "DELETE",
+                body: JSON.stringify({ filename: transcriptToDelete })
+            });
+
+            if (res.ok) {
+                // Remove from local state
+                setFormData(prev => ({
+                    ...prev,
+                    transcript_metadata: prev.transcript_metadata.filter(
+                        meta => meta.name !== transcriptToDelete
+                    )
+                }));
+                toast.success("Transcript deleted successfully!");
+            } else {
+                toast.error("Failed to delete transcript");
+            }
+        } catch (error) {
+            console.error("Delete error:", error);
+            toast.error("Failed to delete transcript");
+        } finally {
+            setDeleteDialogOpen(false);
+            setTranscriptToDelete(null);
+        }
     };
 
     const handleSave = async (recalculate: boolean = false) => {
@@ -271,8 +312,19 @@ export default function ProfilePage() {
                                             {formData.transcript_metadata.map((file, idx) => (
                                                 <li key={idx} className="text-xs flex items-center gap-2 text-gray-400 bg-gray-950 p-2 rounded border border-gray-800">
                                                     <FileText className="w-3 h-3 text-purple-400" />
-                                                    <span className="truncate">{file.name}</span>
-                                                    <span className="text-gray-600 ml-auto">{new Date(file.date).toLocaleDateString()}</span>
+                                                    <span className="truncate flex-1">{file.name}</span>
+                                                    <span className="text-gray-600">{new Date(file.date).toLocaleDateString()}</span>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        className="h-6 w-6 p-0 ml-2 text-gray-500 hover:text-red-400 hover:bg-red-500/10"
+                                                        onClick={() => {
+                                                            setTranscriptToDelete(file.name);
+                                                            setDeleteDialogOpen(true);
+                                                        }}
+                                                    >
+                                                        <X className="w-3 h-3" />
+                                                    </Button>
                                                 </li>
                                             ))}
                                         </ul>
@@ -357,6 +409,34 @@ export default function ProfilePage() {
                     </div>
                 </div>
             </div>
+
+            {/* Delete Confirmation Dialog */}
+            <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                <DialogContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+                    <DialogHeader>
+                        <DialogTitle className="text-gray-900 dark:text-white">Delete Transcript</DialogTitle>
+                        <DialogDescription className="text-gray-600 dark:text-gray-400">
+                            Are you sure you want to delete "{transcriptToDelete}"? This action cannot be undone.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <Button
+                            variant="outline"
+                            onClick={() => setDeleteDialogOpen(false)}
+                            className="border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300"
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant="destructive"
+                            onClick={handleDeleteTranscript}
+                            className="bg-red-600 hover:bg-red-700 text-white"
+                        >
+                            Delete
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
