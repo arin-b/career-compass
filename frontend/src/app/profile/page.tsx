@@ -364,65 +364,64 @@ export default function ProfilePage() {
                 {/* Full Width: Interests & Activities */}
                 <div className="mt-8">
                     <Card className="bg-white/80 dark:bg-gray-800/80 border-pink-200 dark:border-pink-800 shadow-xl backdrop-blur-sm rounded-2xl">
-                            <CardHeader>
-                                <CardTitle className="text-gray-900 dark:text-white flex items-center gap-2 text-xl">
-                                    <Sparkles className="w-6 h-6 text-yellow-500" /> Interests & Activities
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-8">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                    <div className="space-y-4">
-                                        <label className="text-lg font-semibold text-gray-700 dark:text-gray-300">Hobbies</label>
-                                        <TagInput
-                                            placeholder="Type hobby and press Enter..."
-                                            value={formData.hobbies}
-                                            onChange={tags => setFormData({ ...formData, hobbies: tags })}
-                                        />
-                                        <p className="text-sm text-gray-500 dark:text-gray-400">e.g. Chess, Painting, Hiking</p>
-                                    </div>
-
-                                    <div className="space-y-4">
-                                        <label className="text-lg font-semibold text-gray-700 dark:text-gray-300">Extracurriculars</label>
-                                        <TagInput
-                                            placeholder="Type activity and press Enter..."
-                                            value={formData.extracurriculars}
-                                            onChange={tags => setFormData({ ...formData, extracurriculars: tags })}
-                                        />
-                                        <p className="text-sm text-gray-500 dark:text-gray-400">e.g. Debate Club, Robotics Team</p>
-                                    </div>
+                        <CardHeader>
+                            <CardTitle className="text-gray-900 dark:text-white flex items-center gap-2 text-xl">
+                                <Sparkles className="w-6 h-6 text-yellow-500" /> Interests & Activities
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-8">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div className="space-y-4">
+                                    <label className="text-lg font-semibold text-gray-700 dark:text-gray-300">Hobbies</label>
+                                    <TagInput
+                                        placeholder="Type hobby and press Enter..."
+                                        value={formData.hobbies}
+                                        onChange={tags => setFormData({ ...formData, hobbies: tags })}
+                                    />
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">e.g. Chess, Painting, Hiking</p>
                                 </div>
 
                                 <div className="space-y-4">
-                                    <label className="text-lg font-semibold text-gray-700 dark:text-gray-300">Additional Context</label>
-                                    <Textarea
-                                        placeholder="Is there anything else you want to tell us? (Specific career goals, constraints, dreams, etc.)"
-                                        className="bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-xl min-h-[150px] text-lg"
-                                        value={formData.additional_context}
-                                        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData({ ...formData, additional_context: e.target.value })}
+                                    <label className="text-lg font-semibold text-gray-700 dark:text-gray-300">Extracurriculars</label>
+                                    <TagInput
+                                        placeholder="Type activity and press Enter..."
+                                        value={formData.extracurriculars}
+                                        onChange={tags => setFormData({ ...formData, extracurriculars: tags })}
                                     />
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">e.g. Debate Club, Robotics Team</p>
                                 </div>
-                            </CardContent>
-                        </Card>
+                            </div>
 
-                        {/* Actions */}
-                        <div className="flex justify-end gap-6 pt-6">
-                            <Button
-                                variant="outline"
-                                onClick={() => handleSave(false)}
-                                disabled={saving}
-                                className="border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 px-8 py-3 text-lg rounded-xl"
-                            >
-                                <Save className="w-5 h-5 mr-2" /> Save Changes
-                            </Button>
-                            <Button
-                                onClick={() => handleSave(true)}
-                                disabled={saving}
-                                className="bg-gradient-to-r from-purple-600 via-blue-600 to-green-600 hover:from-purple-700 hover:via-blue-700 hover:to-green-700 text-white shadow-xl shadow-purple-500/30 px-8 py-3 text-lg rounded-xl"
-                            >
-                                {saving ? <Sparkles className="w-5 h-5 mr-2 animate-spin" /> : <Sparkles className="w-5 h-5 mr-2" />}
-                                Save & Recalculate Roadmap
-                            </Button>
-                        </div>
+                            <div className="space-y-4">
+                                <label className="text-lg font-semibold text-gray-700 dark:text-gray-300">Additional Context</label>
+                                <Textarea
+                                    placeholder="Is there anything else you want to tell us? (Specific career goals, constraints, dreams, etc.)"
+                                    className="bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-xl min-h-[150px] text-lg"
+                                    value={formData.additional_context}
+                                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData({ ...formData, additional_context: e.target.value })}
+                                />
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Actions */}
+                    <div className="flex justify-end gap-6 pt-6">
+                        <Button
+                            variant="outline"
+                            onClick={() => handleSave(false)}
+                            disabled={saving}
+                            className="border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 px-8 py-3 text-lg rounded-xl"
+                        >
+                            <Save className="w-5 h-5 mr-2" /> Save Changes
+                        </Button>
+                        <Button
+                            onClick={() => handleSave(true)}
+                            disabled={saving}
+                            className="bg-gradient-to-r from-purple-600 via-blue-600 to-green-600 hover:from-purple-700 hover:via-blue-700 hover:to-green-700 text-white shadow-xl shadow-purple-500/30 px-8 py-3 text-lg rounded-xl"
+                        >
+                            {saving ? <Sparkles className="w-5 h-5 mr-2 animate-spin" /> : <Sparkles className="w-5 h-5 mr-2" />}
+                            Save & Recalculate Roadmap
+                        </Button>
                     </div>
                 </div>
             </div>
