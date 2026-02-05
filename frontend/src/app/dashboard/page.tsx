@@ -574,7 +574,7 @@ const ChatInterface = () => {
 
             const content = (
                 <div className="space-y-2">
-                    <p>{data.reply}</p>
+                    <p>{data.response}</p>
                     {data.context && data.context.length > 0 && (
                         <div className="text-xs bg-gray-800 p-2 rounded border border-gray-700">
                             <p className="font-bold text-gray-500 mb-1">Sources:</p>
