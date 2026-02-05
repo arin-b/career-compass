@@ -402,7 +402,45 @@ const ChatInterface = () => {
     ]);
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
+    const [width, setWidth] = useState(384); // default w-96 = 384px
+    const [isResizing, setIsResizing] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    const handleMouseDown = () => {
+        setIsResizing(true);
+    };
+
+    useEffect(() => {
+        const handleMouseMove = (e: MouseEvent) => {
+            if (!isResizing || !containerRef.current) return;
+            
+            const container = containerRef.current;
+            const rect = container.getBoundingClientRect();
+            const newWidth = window.innerWidth - e.clientX;
+            
+            // Constrain width between 300px and 800px
+            if (newWidth >= 300 && newWidth <= 800) {
+                setWidth(newWidth);
+            }
+        };
+
+        const handleMouseUp = () => {
+            setIsResizing(false);
+        };
+
+        if (isResizing) {
+            document.addEventListener('mousemove', handleMouseMove);
+            document.addEventListener('mouseup', handleMouseUp);
+            document.body.style.cursor = 'ew-resize';
+        }
+
+        return () => {
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+            document.body.style.cursor = 'default';
+        };
+    }, [isResizing]);
 
     useEffect(() => {
         if (scrollRef.current) {
@@ -449,8 +487,19 @@ const ChatInterface = () => {
     }
 
     return (
-        <div className={`transition-all duration-300 ease-in-out border-l border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 h-full flex flex-col backdrop-blur-md ${isOpen ? 'w-96' : 'w-12'}`}>
-            <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center bg-gradient-to-r from-purple-100 to-blue-100 dark:from-purple-900/50 dark:to-blue-900/50">
+        <div 
+            ref={containerRef}
+            className={`transition-all duration-300 ease-in-out border-l border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 h-full flex flex-col backdrop-blur-md relative group ${isOpen ? '' : 'w-12'}`}
+            style={{ width: isOpen ? `${width}px` : '48px' }}
+        >
+            {isOpen && (
+                <div
+                    onMouseDown={handleMouseDown}
+                    className="absolute left-0 top-0 bottom-0 w-1 bg-transparent hover:bg-purple-500 cursor-ew-resize transition-colors duration-200 group-hover:bg-purple-400"
+                    title="Drag to resize chat panel"
+                />
+            )}
+            <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center bg-gradient-to-r from-purple-100 to-blue-100 dark:from-purple-900/50 dark:to-blue-900/50 relative z-10">
                 {isOpen && (
                     <div className="flex items-center gap-3 font-bold text-xl text-gray-800 dark:text-gray-200">
                         <Sparkles className="w-6 h-6 text-purple-600 dark:text-purple-400" />

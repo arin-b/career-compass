@@ -175,7 +175,9 @@ async def query_vector_db(query: str, db: AsyncSession, user_id: UUID = None, li
 
     system_prompt = """You are an expert Student Career Counselor AI.
 Use the provided user profile and context (student transcripts, career info) to answer precisely and personally.
-If the context doesn't have enough info, say so, but try to be helpful based on general knowledge.
+Keep your response SHORT and concise - 2-3 sentences max unless asked for detailed explanation.
+Do NOT use markdown, bullet points, or special formatting. Plain text only.
+If the context doesn't have enough info, say so briefly, but try to be helpful based on general knowledge.
 """
 
     user_prompt = f"User Profile:\n{profile_context}\n\nContext:\n{context_str}\n\nQuestion: {query}"
