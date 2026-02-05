@@ -245,7 +245,7 @@ ${steps.map((s: any) => `- ${s.title}: ${s.desc}`).join('\n')}
                 interests: ["Software Engineering", "AI", "Distributed Systems"],
                 transcript_summary: uploadedTranscript ? "Refer to Profile" : "No transcript provided"
             };
-            
+
             if (previousRoadmapContext) {
                 payload.previous_roadmap_summary = previousRoadmapContext;
             }
@@ -524,11 +524,11 @@ const ChatInterface = () => {
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
             if (!isResizing || !containerRef.current) return;
-            
+
             const container = containerRef.current;
             const rect = container.getBoundingClientRect();
             const newWidth = window.innerWidth - e.clientX;
-            
+
             // Constrain width between 300px and 800px
             if (newWidth >= 300 && newWidth <= 800) {
                 setWidth(newWidth);
@@ -572,9 +572,16 @@ const ChatInterface = () => {
             });
             const data = await res.json();
 
+            // Handle structured LLM response: extract text from object if needed
+            let responseText = data.response;
+            if (typeof responseText === 'object' && responseText !== null) {
+                // LangChain may return {type, text, extras} format
+                responseText = responseText.text || responseText.content || JSON.stringify(responseText);
+            }
+
             const content = (
                 <div className="space-y-2">
-                    <p>{data.response}</p>
+                    <p>{responseText}</p>
                     {data.context && data.context.length > 0 && (
                         <div className="text-xs bg-gray-800 p-2 rounded border border-gray-700">
                             <p className="font-bold text-gray-500 mb-1">Sources:</p>
@@ -597,7 +604,7 @@ const ChatInterface = () => {
     }
 
     return (
-        <div 
+        <div
             ref={containerRef}
             className={`transition-all duration-300 ease-in-out border-l border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 h-full flex flex-col backdrop-blur-md relative group ${isOpen ? '' : 'w-12'}`}
             style={{ width: isOpen ? `${width}px` : '48px' }}
