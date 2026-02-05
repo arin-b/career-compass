@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { useState, useRef, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { Send, User, Bot, Sparkles, ChevronLeft, ChevronRight, GraduationCap, Map, BookOpen, Clock, Upload, FileText, CheckCircle, LogOut } from "lucide-react"
+import { Trophy } from "lucide-react"
 import { useDropzone } from "react-dropzone"
 import { toast } from "sonner"
 import { motion } from "framer-motion"
@@ -13,6 +14,7 @@ import { fetchClient } from "@/lib/api"
 
 import { Sidebar } from "@/components/Sidebar";
 
+import confetti from "canvas-confetti"
 interface TimelineItemProps {
     title: string;
     semester?: string;
@@ -157,6 +159,8 @@ const RoadmapTimeline = () => {
     const [steps, setSteps] = useState<any[]>([]);
     const [generating, setGenerating] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [showCompletionDialog, setShowCompletionDialog] = useState(false);
+    const [roadmapHistory, setRoadmapHistory] = useState<any[]>([]);
     const router = useRouter();
 
     const fetchLatestRoadmap = async () => {
@@ -192,6 +196,7 @@ const RoadmapTimeline = () => {
 
     useEffect(() => {
         fetchLatestRoadmap();
+        fetchRoadmapHistory();
     }, []);
 
     const handleLogout = () => {
@@ -201,7 +206,30 @@ const RoadmapTimeline = () => {
         router.push("/login");
     };
 
-    const handleGenerate = async (uploadedTranscript: boolean = false) => {
+    const fetchRoadmapHistory = async () => {
+        try {
+            const res = await fetchClient("/roadmaps/history");
+            if (res.ok) {
+                const data = await res.json();
+                setRoadmapHistory(data.roadmaps || []);
+            }
+        } catch (error) {
+            console.log("Error fetching roadmap history:", error);
+        }
+    };
+
+    const handleGenerateFollowUp = async () => {
+        const completedRoadmapSummary = `
+Previously Completed Roadmap:
+Title: Career Roadmap
+Completed Milestones:
+${steps.map((s: any) => `- ${s.title}: ${s.desc}`).join('\n')}
+        `;
+        setShowCompletionDialog(false);
+        await handleGenerate(false, completedRoadmapSummary);
+    };
+
+    const handleGenerate = async (uploadedTranscript: boolean = false, previousRoadmapContext?: string) => {
         console.log("Sending request... UploadedTranscript:", uploadedTranscript);
         setGenerating(true);
 
@@ -212,11 +240,15 @@ const RoadmapTimeline = () => {
         try {
             const userId = "7dd566d5-5571-40f6-b913-e5e681ea0cb1";
 
-            const payload = {
+            const payload: any = {
                 user_id: userId,
                 interests: ["Software Engineering", "AI", "Distributed Systems"],
                 transcript_summary: uploadedTranscript ? "Refer to Profile" : "No transcript provided"
             };
+            
+            if (previousRoadmapContext) {
+                payload.previous_roadmap_summary = previousRoadmapContext;
+            }
             console.log("Request Payload:", payload);
 
             const res = await fetchClient("/roadmaps/generate", {
@@ -318,6 +350,20 @@ const RoadmapTimeline = () => {
 
     const completedCount = steps.filter((step: any) => step.completed).length;
 
+    const allCompleted = steps.length > 0 && completedCount === steps.length;
+
+    // Check if all milestones are completed and show celebration
+    useEffect(() => {
+        if (allCompleted && steps.length > 0) {
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+            setShowCompletionDialog(true);
+        }
+    }, [allCompleted, steps.length]);
+
     if (loading) {
         return (
             <div className="flex-1 p-8 bg-gradient-to-br from-gray-50 via-purple-50 to-blue-50 dark:from-gray-900 dark:via-purple-900/10 dark:to-blue-900/10 text-gray-900 dark:text-white overflow-hidden flex flex-col h-screen items-center justify-center">
@@ -395,6 +441,66 @@ const RoadmapTimeline = () => {
                     ))}
                 </motion.div>
             </div>
+
+            {showCompletionDialog && (
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+                    onClick={() => setShowCompletionDialog(false)}
+                >
+                    <motion.div
+                        initial={{ scale: 0.9, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        onClick={(e) => e.stopPropagation()}
+                        className="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-2xl w-full shadow-2xl"
+                    >
+                        <div className="text-center mb-6">
+                            <motion.div
+                                animate={{ rotate: 360 }}
+                                transition={{ duration: 2, repeat: Infinity }}
+                                className="inline-block mb-4"
+                            >
+                                <Trophy className="w-16 h-16 text-yellow-500" />
+                            </motion.div>
+                            <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-blue-600 to-green-600 dark:from-purple-400 dark:via-blue-400 dark:to-green-400 mb-2">
+                                Roadmap Complete! 🎉
+                            </h2>
+                            <p className="text-lg text-gray-600 dark:text-gray-300 mb-6">
+                                Congratulations! You've completed all milestones in your career roadmap. Your dedication and progress are impressive!
+                            </p>
+                        </div>
+                        <div className="bg-gradient-to-r from-purple-100 to-blue-100 dark:from-purple-900/30 dark:to-blue-900/30 rounded-xl p-6 mb-8">
+                            <h3 className="font-bold text-lg text-purple-800 dark:text-purple-200 mb-3">Your Journey So Far:</h3>
+                            <p className="text-gray-700 dark:text-gray-300 mb-4">
+                                You've successfully completed {steps.length} milestone{steps.length !== 1 ? 's' : ''} and acquired valuable skills and experience.
+                            </p>
+                            {roadmapHistory.length > 1 && (
+                                <p className="text-sm text-gray-600 dark:text-gray-400">
+                                    This is roadmap #{roadmapHistory.length} in your career journey.
+                                </p>
+                            )}
+                        </div>
+                        <div className="space-y-3">
+                            <Button
+                                onClick={handleGenerateFollowUp}
+                                disabled={generating}
+                                className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-lg py-3 text-lg rounded-xl"
+                            >
+                                {generating ? <Sparkles className="w-5 h-5 animate-spin mr-2" /> : <Sparkles className="w-5 h-5 mr-2" />}
+                                {generating ? "Generating Next Roadmap..." : "Generate Next Roadmap"}
+                            </Button>
+                            <Button
+                                onClick={() => setShowCompletionDialog(false)}
+                                variant="outline"
+                                className="w-full border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 py-3 text-lg rounded-xl"
+                            >
+                                Maybe Later
+                            </Button>
+                        </div>
+                    </motion.div>
+                </motion.div>
+            )}
         </div>
     )
 }
