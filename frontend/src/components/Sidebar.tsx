@@ -23,7 +23,7 @@ export const Sidebar = () => {
 
     const major = profile?.manual_major || "Computer Science (Default)";
     const gpa = profile?.manual_gpa || "3.8 (Default)";
-    const name = profile?.display_name || "Alex H.";
+    const name = profile?.display_name || "";
     const avatar = profile?.avatar_base64;
     const role = profile?.role;
 

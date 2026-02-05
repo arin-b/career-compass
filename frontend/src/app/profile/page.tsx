@@ -248,7 +248,7 @@ export default function ProfilePage() {
                                 <div className="space-y-3">
                                     <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Display Name</label>
                                     <Input
-                                        placeholder="Alex Hamilton"
+                                        placeholder="Your name"
                                         className="bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-xl h-12 text-lg"
                                         value={formData.display_name}
                                         onChange={e => setFormData({ ...formData, display_name: e.target.value })}

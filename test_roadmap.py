@@ -4,7 +4,6 @@ import sys
 
 def test_roadmap_gen():
     url = "http://localhost:8000/api/v1/roadmaps/generate"
-    # User ID for "Alex H."
     user_id = "7dd566d5-5571-40f6-b913-e5e681ea0cb1"
     
     payload = {

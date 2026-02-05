@@ -6,7 +6,7 @@ from reportlab.lib.pagesizes import letter
 
 def create_dummy_pdf(filename="dummy_transcript.pdf"):
     c = canvas.Canvas(filename, pagesize=letter)
-    c.drawString(100, 750, "Transcript for Alex H.")
+    c.drawString(100, 750, "Transcript")
     c.drawString(100, 730, "Course: Introduction to AI - Grade: A")
     c.drawString(100, 710, "Course: Data Structures - Grade: A-")
     c.drawString(100, 690, "Course: Operating Systems - Grade: B+")
