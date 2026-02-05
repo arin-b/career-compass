@@ -166,17 +166,21 @@ const RoadmapTimeline = () => {
                 const data = await res.json();
                 console.log("Fetched latest roadmap:", data);
                 if (data.roadmap && data.roadmap.milestones) {
-                    setSteps(data.roadmap.milestones.map((m: any, index: number) => ({
-                        id: m.id || `milestone-MISSING-ID-${index}`,
-                        title: m.title,
-                        semester: m.semester,
-                        status: m.status || "Pending",
-                        desc: m.description,
-                        active: index === 0, // Logic for active needs refinement but keeping simple
-                        projects: m.projects,
-                        skills: m.skills,
-                        completed: m.status === "Done"
-                    })));
+                    setSteps(data.roadmap.milestones.map((m: any, index: number) => {
+                        const milestoneId = m.id ? String(m.id) : null;
+                        console.log(`Milestone ${index}:`, { id: milestoneId, title: m.title, status: m.status });
+                        return {
+                            id: milestoneId,
+                            title: m.title,
+                            semester: m.semester,
+                            status: m.status || "Pending",
+                            desc: m.description,
+                            active: index === 0,
+                            projects: m.projects,
+                            skills: m.skills,
+                            completed: m.status === "Done"
+                        };
+                    }));
                 }
             }
         } catch (error) {
@@ -272,7 +276,7 @@ const RoadmapTimeline = () => {
 
     const handleMilestoneToggle = async (milestoneId: string, isCompleted: boolean) => {
         // Check if milestoneId is a valid UUID, if not, show error
-        if (!milestoneId || milestoneId.startsWith('milestone-MISSING-ID-')) {
+        if (!milestoneId) {
             toast.error("This milestone cannot be updated. Please refresh the page and try again.");
             console.error("Invalid milestone ID:", milestoneId);
             return;
