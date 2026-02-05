@@ -17,9 +17,10 @@ def get_llm():
         raise ValueError("GOOGLE_API_KEY not found")
     return ChatGoogleGenerativeAI(model="gemini-flash-latest", google_api_key=GOOGLE_API_KEY, temperature=0)
 
-async def generate_career_roadmap(transcript_text: str, interests: List[str], manual_profile_data: Dict[str, Any] = None) -> Dict[str, Any]:
+async def generate_career_roadmap(transcript_text: str, interests: List[str], manual_profile_data: Dict[str, Any] = None, previous_roadmap_context: str = None) -> Dict[str, Any]:
     """
     Generates a structured career roadmap based on transcript and interests, prioritizing manual profile data.
+    Can accept context from previously completed roadmaps to build upon past progress.
     """
     if manual_profile_data is None:
         manual_profile_data = {}
@@ -50,10 +51,23 @@ async def generate_career_roadmap(transcript_text: str, interests: List[str], ma
     logger.info(f"USER PROFILE DATA: {user_profile_str}")
 
     current_date = datetime.now().strftime("%B %d %Y")
+    
+    # Build context about previous roadmap if provided
+    previous_context_str = ""
+    if previous_roadmap_context:
+        previous_context_str = f"""
+    
+    PREVIOUSLY COMPLETED ROADMAP CONTEXT:
+    {previous_roadmap_context}
+    
+    Use this context to build upon the user's previous progress and create a roadmap that naturally extends their career journey.
+    """
+    
     system_prompt = f"""
     Current Date: {current_date}
     You are an expert Career Counselor AI.
     Your goal is to create a detailed, semester-by-semester career roadmap based on the COMPLETE user profile provided.
+    {previous_context_str}
     
     CRITICAL INSTRUCTIONS:
     1. **Holistic Analysis**: You MUST incorporate ALL details from the provided user profile, including manual major, GPA, hobbies, extracurriculars, bio, additional context, and transcript data.
@@ -63,6 +77,7 @@ async def generate_career_roadmap(transcript_text: str, interests: List[str], ma
        - Do NOT force them into a career path matching their transcript if they explicitly asked for something else.
     3. **Academic Alignment**: Use the transcript to gauge their current level if relevant to the target field.
     4. **Structure**: Output strictly valid JSON.
+    5. **Building on Success**: If this is a follow-up roadmap, build naturally from the previous one, introducing new advanced skills and opportunities that follow from what they've already accomplished.
     
     Output:
     - Strictly valid JSON format.

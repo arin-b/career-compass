@@ -14,7 +14,7 @@ router = APIRouter()
 logger = get_logger()
 
 class GenerateRoadmapRequest(BaseModel):
-    pass  # No need for user_id, use current_user
+    previous_roadmap_summary: str = None  # Optional context from previous roadmap completion
 
 from app.api.deps import get_current_user
 
@@ -71,7 +71,12 @@ async def generate_roadmap(request: GenerateRoadmapRequest, db: AsyncSession = D
         interests = ["General Career Growth"]
 
     try:
-        roadmap_json = await generate_career_roadmap(transcript_text, interests, manual_data)
+        roadmap_json = await generate_career_roadmap(
+            transcript_text, 
+            interests, 
+            manual_data,
+            previous_roadmap_summary=request.previous_roadmap_summary if request.previous_roadmap_summary else None
+        )
         
         new_roadmap = Roadmap(
             user_id=user.id,
@@ -255,3 +260,42 @@ async def update_milestone_status(
         "status": milestone.status,
         "title": milestone.title
     }
+
+@router.get("/history")
+async def get_roadmap_history(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Retrieves the user's roadmap history (all roadmaps they've generated).
+    """
+    result = await db.execute(
+        select(Roadmap)
+        .where(Roadmap.user_id == current_user.id)
+        .order_by(Roadmap.created_at.desc())
+    )
+    roadmaps = result.scalars().all()
+    
+    roadmap_list = []
+    for roadmap in roadmaps:
+        # Count completed milestones
+        milestones_result = await db.execute(
+            select(RoadmapMilestone).where(RoadmapMilestone.roadmap_id == roadmap.id)
+        )
+        milestones = milestones_result.scalars().all()
+        completed_count = sum(1 for m in milestones if m.status == MilestoneStatus.DONE)
+        
+        roadmap_list.append({
+            "id": str(roadmap.id),
+            "title": roadmap.title,
+            "description": roadmap.description,
+            "created_at": roadmap.created_at.isoformat(),
+            "status": roadmap.status,
+            "total_milestones": len(milestones),
+            "completed_milestones": completed_count
+        })
+    
+    return {
+        "roadmaps": roadmap_list
+    }
+
