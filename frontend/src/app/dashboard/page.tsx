@@ -157,10 +157,12 @@ const RoadmapTimeline = () => {
     const [steps, setSteps] = useState<any[]>([]);
     const [generating, setGenerating] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [hasRoadmap, setHasRoadmap] = useState(false);
     const router = useRouter();
 
     const fetchLatestRoadmap = async () => {
         try {
+            setLoading(true);
             const res = await fetchClient("/roadmaps/latest");
             if (res.ok) {
                 const data = await res.json();
@@ -177,10 +179,21 @@ const RoadmapTimeline = () => {
                         skills: m.skills,
                         completed: m.status === "Done"
                     })));
+                    setHasRoadmap(true);
                 }
+            } else if (res.status === 404) {
+                console.log("No existing roadmap found");
+                setHasRoadmap(false);
+                setSteps([]);
+            } else {
+                console.error("Error fetching roadmap:", res.status);
+                setHasRoadmap(false);
+                setSteps([]);
             }
         } catch (error) {
-            console.log("No existing roadmap found or error fetching.");
+            console.error("Error fetching roadmap:", error);
+            setHasRoadmap(false);
+            setSteps([]);
         } finally {
             setLoading(false);
         }
@@ -254,7 +267,10 @@ const RoadmapTimeline = () => {
                     completed: false
                 }));
                 setSteps(newSteps);
+                setHasRoadmap(true);
                 toast.success("Roadmap Successfully Generated!");
+                // Refresh to ensure database is synced
+                await fetchLatestRoadmap();
             } else {
                 console.error("Roadmap Data Missing. Received:", data);
                 console.warn("Unexpected response structure:", data);
@@ -321,6 +337,58 @@ const RoadmapTimeline = () => {
                     <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-purple-600 mx-auto mb-4"></div>
                     <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">Loading Your Roadmap</h2>
                     <p className="text-gray-600 dark:text-gray-400">Fetching your personalized career path...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (!hasRoadmap || steps.length === 0) {
+        return (
+            <div className="flex-1 p-8 bg-gradient-to-br from-gray-50 via-purple-50 to-blue-50 dark:from-gray-900 dark:via-purple-900/10 dark:to-blue-900/10 text-gray-900 dark:text-white overflow-hidden flex flex-col h-screen">
+                <div className="flex justify-between items-center mb-8 shrink-0">
+                    <div>
+                        <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-blue-600 to-green-600 dark:from-purple-400 dark:via-blue-400 dark:to-green-400">Your Roadmap</h1>
+                        <p className="text-lg text-gray-600 dark:text-gray-400 mt-2">Generated based on your unique profile and interests</p>
+                    </div>
+                    <Button
+                        onClick={() => handleLogout()}
+                        className="border-2 border-red-300 dark:border-red-700 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 px-8 py-3 text-lg rounded-xl"
+                    >
+                        <LogOut className="w-5 h-5 mr-2" />
+                        Logout
+                    </Button>
+                </div>
+
+                <div className="flex-1 flex items-center justify-center">
+                    <div className="text-center max-w-2xl">
+                        <div className="mb-6">
+                            <Map className="w-24 h-24 mx-auto text-purple-400 opacity-50 mb-4" />
+                        </div>
+                        <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-200 mb-4">No Roadmap Yet</h2>
+                        <p className="text-lg text-gray-600 dark:text-gray-400 mb-8">You haven't generated a career roadmap yet. Create one now to get personalized recommendations based on your profile!</p>
+                        
+                        <div className="space-y-4">
+                            <Button
+                                onClick={() => handleGenerate(false)}
+                                disabled={generating}
+                                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-xl shadow-purple-500/30 px-8 py-4 text-lg rounded-xl w-full"
+                            >
+                                {generating ? <Sparkles className="w-5 h-5 animate-spin mr-2" /> : <Sparkles className="w-5 h-5 mr-2" />}
+                                {generating ? "Generating..." : "Generate Your Roadmap"}
+                            </Button>
+                            
+                            <Button
+                                onClick={() => router.push("/profile")}
+                                variant="outline"
+                                className="border-2 border-purple-300 dark:border-purple-700 text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 px-8 py-4 text-lg rounded-xl w-full"
+                            >
+                                <GraduationCap className="w-5 h-5 mr-2" />
+                                Complete Your Profile First
+                            </Button>
+                        </div>
+
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-8">Tip: Make sure to upload your transcript or fill in your profile details for better recommendations</p>
+                    </div>
                 </div>
             </div>
         );
@@ -464,7 +532,7 @@ const ChatInterface = () => {
 
             const content = (
                 <div className="space-y-2">
-                    <p>{data.response}</p>
+                    <p>{data.reply}</p>
                     {data.context && data.context.length > 0 && (
                         <div className="text-xs bg-gray-800 p-2 rounded border border-gray-700">
                             <p className="font-bold text-gray-500 mb-1">Sources:</p>
