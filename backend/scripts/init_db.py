@@ -44,29 +44,9 @@ async def init_db():
         
         logger.info("Tables created successfully.")
 
-    # 3. Create Dummy User
-    from sqlalchemy.orm import sessionmaker
-    from sqlalchemy.ext.asyncio import AsyncSession
-    
-    AsyncSessionLocal = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
-    
-    async with AsyncSessionLocal() as session:
-        result = await session.execute(text("SELECT * FROM users WHERE email = 'alex@example.com'"))
-        existing_user = result.scalar()
-        
-        if not existing_user:
-            logger.info("Creating dummy user Alex...")
-            new_user = User(
-                email="alex@example.com",
-                hashed_password="mock_hashed_password",
-                full_name="Alex Hamilton",
-                academic_level=AcademicLevel.UNDERGRADUATE
-            )
-            session.add(new_user)
-            await session.commit()
-            logger.info(f"User Alex created with ID: {new_user.id}")
-        else:
-            logger.info("User Alex already exists.")
+    # 3. Skip creating a dummy user in init scripts. Real user accounts
+    # should be created through the signup flow or migrations.
+    logger.info("Skipping dummy user creation (no hardcoded test user).")
 
     await engine.dispose()
 

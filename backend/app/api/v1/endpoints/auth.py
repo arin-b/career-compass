@@ -25,6 +25,7 @@ async def create_user(user_in: UserCreate, db: AsyncSession = Depends(get_db)):
         email=user_in.email,
         hashed_password=security.get_password_hash(user_in.password),
         full_name=user_in.full_name,
+        display_name=user_in.full_name,
         academic_level=AcademicLevel(user_in.academic_level) if user_in.academic_level in AcademicLevel.__members__.values() else AcademicLevel.OTHER
     )
     db.add(new_user)

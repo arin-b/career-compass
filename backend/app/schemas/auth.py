@@ -23,6 +23,7 @@ class UserResponse(BaseModel):
     id: UUID
     email: EmailStr
     full_name: Optional[str] = None
+    display_name: Optional[str] = None
     academic_level: Optional[str] = None
 
     class Config:

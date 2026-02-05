@@ -31,7 +31,7 @@ async def upload_transcript(
 @router.post("/chat")
 async def chat(request: ChatRequest, db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)):
     try:
-        result = await query_vector_db(request.query, db)
+        result = await query_vector_db(request.query, db, current_user.id)
         print(f"LLM Response: {result}")
         
         return {

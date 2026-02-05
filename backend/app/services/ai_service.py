@@ -113,7 +113,7 @@ async def process_transcript(user_id: UUID, file: UploadFile, db: AsyncSession, 
     await db.commit()
     return {"message": f"Processed {len(chunks)} chunks from {file.filename}", "transcript_length": len(text)}
 
-async def query_vector_db(query: str, db: AsyncSession, limit: int = 3):
+async def query_vector_db(query: str, db: AsyncSession, user_id: UUID = None, limit: int = 3):
     """
     1. Embeds query.
     2. Searches VectorDB.
@@ -122,10 +122,21 @@ async def query_vector_db(query: str, db: AsyncSession, limit: int = 3):
     embeddings_model = get_embeddings_model()
     query_vector = embeddings_model.embed_query(query)
 
-    stmt = select(VectorStore).order_by(
-        VectorStore.embedding.l2_distance(query_vector)
-    ).limit(limit)
-    
+    # Try to prioritize user-specific vectors when user_id is provided
+    if user_id:
+        stmt = (
+            select(VectorStore)
+            .where(VectorStore.metadata_.contains({"user_id": str(user_id)}))
+            .order_by(VectorStore.embedding.l2_distance(query_vector))
+            .limit(limit)
+        )
+    else:
+        stmt = (
+            select(VectorStore)
+            .order_by(VectorStore.embedding.l2_distance(query_vector))
+            .limit(limit)
+        )
+
     result = await db.execute(stmt)
     matches = result.scalars().all()
     
@@ -134,12 +145,40 @@ async def query_vector_db(query: str, db: AsyncSession, limit: int = 3):
 
     llm = get_llm()
     
-    system_prompt = """You are an expert Student Career Counselor AI. 
-    Use the provided context (student transcripts, career info) to answer variables.
-    If the context doesn't have enough info, say so, but try to be helpful based on general knowledge.
-    """
-    
-    user_prompt = f"Context:\n{context_str}\n\nQuestion: {query}"
+    # Fetch user's Profile and include it in the prompt so the LLM retains full user context
+    profile_context = ""
+    if user_id:
+        profile_res = await db.execute(select(Profile).where(Profile.id == user_id))
+        profile = profile_res.scalar_one_or_none()
+        if profile:
+            pieces = []
+            if profile.bio:
+                pieces.append(f"Bio: {profile.bio}")
+            if profile.transcript_summary:
+                pieces.append(f"Transcript Summary: {profile.transcript_summary}")
+            if profile.additional_context:
+                pieces.append(f"Additional Context: {profile.additional_context}")
+            if profile.skills:
+                pieces.append(f"Skills: {profile.skills}")
+            if profile.interests:
+                pieces.append(f"Interests: {profile.interests}")
+            if profile.manual_major:
+                pieces.append(f"Declared Major: {profile.manual_major}")
+            if profile.manual_gpa is not None:
+                pieces.append(f"GPA: {profile.manual_gpa}")
+            if profile.hobbies:
+                pieces.append(f"Hobbies: {profile.hobbies}")
+            if profile.extracurriculars:
+                pieces.append(f"Extracurriculars: {profile.extracurriculars}")
+
+            profile_context = "\n".join(pieces)
+
+    system_prompt = """You are an expert Student Career Counselor AI.
+Use the provided user profile and context (student transcripts, career info) to answer precisely and personally.
+If the context doesn't have enough info, say so, but try to be helpful based on general knowledge.
+"""
+
+    user_prompt = f"User Profile:\n{profile_context}\n\nContext:\n{context_str}\n\nQuestion: {query}"
     
     response = llm.invoke([
         SystemMessage(content=system_prompt),
