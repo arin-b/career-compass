@@ -72,10 +72,10 @@ async def generate_roadmap(request: GenerateRoadmapRequest, db: AsyncSession = D
 
     try:
         roadmap_json = await generate_career_roadmap(
-            transcript_text, 
-            interests, 
+            transcript_text,
+            interests,
             manual_data,
-            previous_roadmap_summary=request.previous_roadmap_summary if request.previous_roadmap_summary else None
+            previous_roadmap_context=request.previous_roadmap_summary if request.previous_roadmap_summary else None
         )
         
         new_roadmap = Roadmap(
