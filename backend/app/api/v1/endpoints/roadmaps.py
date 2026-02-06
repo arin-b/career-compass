@@ -190,8 +190,8 @@ async def get_latest_roadmap(
         # We will attempt to match by Title first, then by index as fallback.
         
         db_milestones_map = {m.title: m for m in milestones}
-        # Also create a list sorted by creation time for index fallback
-        sorted_db_milestones = sorted(milestones, key=lambda m: m.created_at)
+        # Use list order as-is since milestones are created sequentially
+        sorted_db_milestones = list(milestones)
         
         logger.info(f"Matching {len(roadmap_data.get('milestones', []))} JSON milestones with {len(milestones)} DB milestones")
         
