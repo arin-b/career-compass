@@ -10,7 +10,7 @@ from app.models.models import VectorStore
 import io
 from langchain_core.messages import HumanMessage, SystemMessage
 
-import google.generativeai as genai
+import google.genai as genai
 
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
@@ -22,7 +22,7 @@ else:
 def get_embeddings_model():
     if not GOOGLE_API_KEY:
         raise ValueError("GOOGLE_API_KEY not found in environment")
-    return GoogleGenerativeAIEmbeddings(model="models/text-embedding-004", google_api_key=GOOGLE_API_KEY)
+    return GoogleGenerativeAIEmbeddings(model="models/text-embedding-004", google_api_key=GOOGLE_API_KEY, task_type="retrieval_document")
 
 def get_llm():
     if not GOOGLE_API_KEY:
