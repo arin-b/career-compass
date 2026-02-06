@@ -286,6 +286,7 @@ ${steps.map((s: any) => `- ${s.title}: ${s.desc}`).join('\n')}
             }
 
             if (roadmapData && roadmapData.milestones) {
+                console.log("Milestones from API:", roadmapData.milestones.map((m: any) => ({ id: m.id, title: m.title })));
                 const newSteps = roadmapData.milestones.map((m: any, index: number) => ({
                     id: m.id || `milestone-MISSING-ID-${index}`,
                     title: m.title,

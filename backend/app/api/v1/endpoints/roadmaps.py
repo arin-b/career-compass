@@ -106,12 +106,18 @@ async def generate_roadmap(request: GenerateRoadmapRequest, db: AsyncSession = D
         await db.refresh(new_roadmap)
         
         milestones_result = await db.execute(
-            select(RoadmapMilestone).where(RoadmapMilestone.roadmap_id == new_roadmap.id)
+            select(RoadmapMilestone).where(RoadmapMilestone.roadmap_id == new_roadmap.id).order_by(RoadmapMilestone.id)
         )
         created_milestones = milestones_result.scalars().all()
         
-        roadmap_with_ids = roadmap_json.copy()
+        logger.info(f"Created {len(created_milestones)} milestones in DB for roadmap {new_roadmap.id}")
+        for idx, m in enumerate(created_milestones):
+            logger.info(f"  Milestone {idx}: ID={m.id}, Title={m.title}")
+        
+        import copy
+        roadmap_with_ids = copy.deepcopy(roadmap_json)
         if "milestones" in roadmap_with_ids and created_milestones:
+            logger.info(f"Injecting IDs into {len(roadmap_with_ids['milestones'])} JSON milestones")
             # Map created milestones by title (or sequence if titles assume uniqueness, which is risky but standard for initial generation)
             # Using index is safest for initial generation sequence mapping
             for i, milestone_db in enumerate(created_milestones):
@@ -119,9 +125,15 @@ async def generate_roadmap(request: GenerateRoadmapRequest, db: AsyncSession = D
                     roadmap_with_ids["milestones"][i]["id"] = str(milestone_db.id)
                     logger.info(f"Injecting ID {milestone_db.id} for milestone {roadmap_with_ids['milestones'][i].get('title')}")
             # Save the IDs back to the database
+            logger.info(f"Saving roadmap content with IDs to database")
             new_roadmap.content = roadmap_with_ids
             await db.commit()
+            logger.info(f"Roadmap committed with IDs")
+        else:
+            logger.warning(f"Could not inject IDs: has milestones in JSON? {('milestones' in roadmap_with_ids)}, created_milestones count: {len(created_milestones)}")
         
+        logger.info(f"Returning roadmap response with milestones: {len(roadmap_with_ids.get('milestones', []))}")
+        logger.info(f"First milestone in response has ID? {roadmap_with_ids.get('milestones', [{}])[0].get('id') if roadmap_with_ids.get('milestones') else 'N/A'}")
         return {
             "message": "Roadmap generated successfully", 
             "roadmap_id": new_roadmap.id,

@@ -107,8 +107,22 @@ async def generate_career_roadmap(transcript_text: str, interests: List[str], ma
         ])
         
         content = response.content
+        logger.info(f"LLM Response Type: {type(content)}, Content sample: {str(content)[:200]}")
         if isinstance(content, list):
-            content = "".join([c if isinstance(c, str) else str(c) for c in content])
+            logger.info(f"Response is a list with {len(content)} items")
+            # If it's a list of content blocks, extract just the text parts
+            text_parts = []
+            for item in content:
+                if isinstance(item, dict) and "text" in item:
+                    text_parts.append(item["text"])
+                elif isinstance(item, str):
+                    text_parts.append(item)
+                else:
+                    text_parts.append(str(item))
+            content = "".join(text_parts)
+        elif isinstance(content, dict) and "text" in content:
+            logger.info("Response is a dict with 'text' field")
+            content = content["text"]
             
         content = extract_json(content)
         
