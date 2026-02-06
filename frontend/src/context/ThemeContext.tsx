@@ -22,26 +22,31 @@ const colorMap: Record<ColorScheme, string> = {
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [colorScheme, setColorScheme] = useState<ColorScheme>('purple');
-  const [mounted, setMounted] = useState(false);
 
+  // On mount, read saved preference from localStorage (client only)
   useEffect(() => {
-    setMounted(true);
-    const saved = localStorage.getItem('colorScheme') as ColorScheme | null;
-    if (saved && ['purple', 'blue', 'emerald', 'rose', 'indigo'].includes(saved)) {
-      setColorScheme(saved);
+    try {
+      const saved = localStorage.getItem('colorScheme') as ColorScheme | null;
+      if (saved && ['purple', 'blue', 'emerald', 'rose', 'indigo'].includes(saved)) {
+        setColorScheme(saved);
+        document.documentElement.setAttribute('data-theme', saved);
+      }
+    } catch (e) {
+      // ignore (server or no access)
     }
   }, []);
 
+  // Persist selection to localStorage and update document attribute on change (client only)
   useEffect(() => {
-    if (mounted) {
+    try {
       localStorage.setItem('colorScheme', colorScheme);
       document.documentElement.setAttribute('data-theme', colorScheme);
+    } catch (e) {
+      // ignore in non-browser environments
     }
-  }, [colorScheme, mounted]);
+  }, [colorScheme]);
 
   const getThemeColor = () => colorMap[colorScheme];
-
-  if (!mounted) return <>{children}</>;
 
   return (
     <ThemeContext.Provider value={{ colorScheme, setColorScheme, getThemeColor }}>
