@@ -19,4 +19,4 @@ python-multipart
 python-dotenv
 python-jose[cryptography]
 bcrypt
-google-genai
+google-generativeai

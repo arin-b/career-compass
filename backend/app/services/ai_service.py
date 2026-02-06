@@ -10,15 +10,6 @@ from app.models.models import VectorStore
 import io
 from langchain_core.messages import HumanMessage, SystemMessage
 
-import google.genai as genai
-
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
-
-if not GOOGLE_API_KEY:
-    print("CRITICAL WARNING: GOOGLE_API_KEY is missing from environment variables! AI features will fail.")
-else:
-    genai.configure(api_key=GOOGLE_API_KEY)
-
 def get_embeddings_model():
     if not GOOGLE_API_KEY:
         raise ValueError("GOOGLE_API_KEY not found in environment")
@@ -29,11 +20,15 @@ def get_llm():
         raise ValueError("GOOGLE_API_KEY not found in environment")
     return ChatGoogleGenerativeAI(model="gemini-flash-latest", google_api_key=GOOGLE_API_KEY)
 
-
 import pdfplumber
 from app.models.models import VectorStore, Profile
 from sqlalchemy import update
 from uuid import UUID
+
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+
+if not GOOGLE_API_KEY:
+    print("CRITICAL WARNING: GOOGLE_API_KEY is missing from environment variables! AI features will fail.")
 
 async def process_transcript(user_id: UUID, file: UploadFile, db: AsyncSession, mode: str = "replace"):
     """
