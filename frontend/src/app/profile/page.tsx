@@ -11,6 +11,8 @@ import { FileUpload } from "@/components/file-upload";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Save, Sparkles, User, GraduationCap, FileText, Plus, RefreshCw, X } from "lucide-react";
+import { ThemeSwitcher } from "@/components/ThemeSwitcher";
+import { ProfileIllustration } from "@/components/illustrations";
 import {
     Dialog,
     DialogContent,
@@ -204,13 +206,16 @@ export default function ProfilePage() {
         <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-green-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-blue-900/20 text-gray-900 dark:text-white p-8 font-sans">
             <div className="max-w-7xl mx-auto space-y-8">
                 {/* Header */}
-                <div className="flex items-center gap-4">
-                    <Button variant="ghost" onClick={() => router.push("/dashboard")} className="text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400">
-                        <ArrowLeft className="w-5 h-5 mr-2" /> Back to Dashboard
-                    </Button>
-                    <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-blue-600 to-green-600 dark:from-purple-400 dark:via-blue-400 dark:to-green-400">
-                        Your Profile
-                    </h1>
+                <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                        <Button variant="ghost" onClick={() => router.push("/dashboard")} className="text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400">
+                            <ArrowLeft className="w-5 h-5 mr-2" /> Back to Dashboard
+                        </Button>
+                        <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-blue-600 to-green-600 dark:from-purple-400 dark:via-blue-400 dark:to-green-400">
+                            Your Profile
+                        </h1>
+                    </div>
+                    <ThemeSwitcher />
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -219,6 +224,7 @@ export default function ProfilePage() {
 
                         {/* Avatar Card */}
                         <Card className="bg-white/80 dark:bg-gray-800/80 border-purple-200 dark:border-purple-800 shadow-xl backdrop-blur-sm flex flex-col items-center p-8 text-center rounded-2xl min-h-[320px]">
+                            <ProfileIllustration />
                             <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-gradient-to-r from-purple-500 to-blue-500 mb-6 bg-gradient-to-br from-purple-100 to-blue-100 dark:from-gray-700 dark:to-gray-600 items-center justify-center flex shadow-lg">
                                 {formData.avatar_base64 ? (
                                     <img src={formData.avatar_base64} alt="Avatar" className="w-full h-full object-cover" />

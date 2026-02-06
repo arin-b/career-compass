@@ -393,6 +393,7 @@ ${steps.map((s: any) => `- ${s.title}: ${s.desc}`).join('\n')}
                     <p className="text-lg text-gray-600 dark:text-gray-400 mt-2">Generated based on your unique profile and interests</p>
                 </div>
                 <div className="flex gap-6">
+                    <ThemeSwitcher />
                     <Button
                         onClick={() => handleGenerate(false)}
                         disabled={generating}
