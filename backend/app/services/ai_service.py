@@ -22,7 +22,7 @@ else:
 def get_embeddings_model():
     if not GOOGLE_API_KEY:
         raise ValueError("GOOGLE_API_KEY not found in environment")
-    return GoogleGenerativeAIEmbeddings(model="models/embedding-001", google_api_key=GOOGLE_API_KEY)
+    return GoogleGenerativeAIEmbeddings(model="models/text-embedding-004", google_api_key=GOOGLE_API_KEY)
 
 def get_llm():
     if not GOOGLE_API_KEY:
