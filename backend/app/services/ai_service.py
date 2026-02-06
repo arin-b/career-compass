@@ -144,7 +144,7 @@ async def query_vector_db(query: str, db: AsyncSession, limit: int = 3):
 
     system_prompt = """You are an expert Student Career Counselor AI. 
     Answer questions helpfully based on general knowledge.
-    """
+    IMPORTANT: Respond ONLY in plain text. Do NOT use markdown, bullet points, bold, italics, or any special formatting. Keep your response clear and simple."""
 
     user_prompt = f"Question: {query}"
 
