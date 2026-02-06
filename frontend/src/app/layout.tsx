@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "next-themes";
+import { ThemeProvider as ColorThemeProvider } from "@/context/ThemeContext";
 import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
 
@@ -35,8 +36,10 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
-          <Toaster position="bottom-right" />
+          <ColorThemeProvider>
+            {children}
+            <Toaster position="bottom-right" />
+          </ColorThemeProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -13,6 +13,8 @@ import { motion } from "framer-motion"
 import { fetchClient } from "@/lib/api"
 
 import { Sidebar } from "@/components/Sidebar";
+import { ThemeSwitcher } from "@/components/ThemeSwitcher"
+import { DashboardIllustration } from "@/components/illustrations"
 
 import confetti from "canvas-confetti"
 interface TimelineItemProps {

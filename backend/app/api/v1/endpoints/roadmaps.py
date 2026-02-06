@@ -118,6 +118,9 @@ async def generate_roadmap(request: GenerateRoadmapRequest, db: AsyncSession = D
                 if i < len(roadmap_with_ids["milestones"]):
                     roadmap_with_ids["milestones"][i]["id"] = str(milestone_db.id)
                     logger.info(f"Injecting ID {milestone_db.id} for milestone {roadmap_with_ids['milestones'][i].get('title')}")
+            # Save the IDs back to the database
+            new_roadmap.content = roadmap_with_ids
+            await db.commit()
         
         return {
             "message": "Roadmap generated successfully", 
@@ -152,7 +155,7 @@ async def get_latest_roadmap(
         
     # Fetch Milestones
     milestones_result = await db.execute(
-        select(RoadmapMilestone).where(RoadmapMilestone.roadmap_id == roadmap.id)
+        select(RoadmapMilestone).where(RoadmapMilestone.roadmap_id == roadmap.id).order_by(RoadmapMilestone.id)
     )
     milestones = milestones_result.scalars().all()
     
@@ -214,12 +217,21 @@ async def get_latest_roadmap(
                 reconciled_milestones.append(ms_json)
             else:
                 # Milestone in JSON but not in DB? Should not happen if sync is correct.
-                # Keep it but it has no ID -> Checkbox will fail.
+                # Try to assign a fallback ID from any remaining DB milestone
                 logger.warning(f"Milestone '{title}' at index {i} found in JSON but not in DB for roadmap {roadmap.id}")
+                # Last resort: use the last DB milestone if available
+                if sorted_db_milestones:
+                    db_match = sorted_db_milestones[-1]
+                    ms_json["id"] = str(db_match.id)
+                    ms_json["status"] = db_match.status
                 reconciled_milestones.append(ms_json)
     else:
-        # No DB milestones? Return JSON as is (will lack IDs)
-        reconciled_milestones = roadmap_data.get("milestones", [])
+        # No DB milestones found
+        logger.error(f"No milestones found in DB for roadmap {roadmap.id}, checking if JSON has milestones...")
+        json_milestones = roadmap_data.get("milestones", [])
+        if json_milestones:
+            logger.error(f"Found {len(json_milestones)} JSON milestones but 0 DB milestones for roadmap {roadmap.id}")
+        reconciled_milestones = json_milestones
         
     roadmap_data["milestones"] = reconciled_milestones
     
