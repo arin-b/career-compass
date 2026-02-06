@@ -43,9 +43,14 @@ const TimelineItem = ({
     const [isChecked, setIsChecked] = useState(completed);
 
     const handleCheckToggle = async () => {
-        if (!id) return;
+        console.log("Checkbox clicked! ID:", id, "Title:", title);
+        if (!id) {
+            console.warn("No ID for milestone:", title);
+            return;
+        }
 
         const newStatus = !isChecked;
+        console.log("Toggling milestone", id, "to", newStatus);
         setIsChecked(newStatus);
         onToggle(id, newStatus);
     };
@@ -75,8 +80,9 @@ const TimelineItem = ({
                 <div className="flex items-start gap-3">
                     {/* Checkbox */}
                     <button
+                        type="button"
                         onClick={handleCheckToggle}
-                        className={`mt-1 w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${isChecked
+                        className={`mt-1 w-5 h-5 rounded border-2 flex items-center justify-center transition-all cursor-pointer ${isChecked
                             ? 'bg-green-500 border-green-500'
                             : 'border-gray-600 hover:border-purple-500'
                             }`}
