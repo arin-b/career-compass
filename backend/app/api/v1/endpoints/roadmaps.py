@@ -198,6 +198,8 @@ async def get_latest_roadmap(
     # We will prioritize DB milestones as source of truth for Status and ID
     # and use JSON content for 'static' data (description, projects, etc) if available
     
+    json_milestones = roadmap_data.get("milestones", [])
+    
     if milestones:
         # Sort milestones by creation time or just assume list order matches if generated together
         # Beware: UUID sort is random. We rely on insertion order usually being preserved in 'all()', but explicit sort is better.
@@ -208,42 +210,103 @@ async def get_latest_roadmap(
         # Use list order as-is since milestones are created sequentially
         sorted_db_milestones = list(milestones)
         
-        logger.info(f"Matching {len(roadmap_data.get('milestones', []))} JSON milestones with {len(milestones)} DB milestones")
+        logger.info(f"Matching {len(json_milestones)} JSON milestones with {len(milestones)} DB milestones")
         
-        for i, ms_json in enumerate(roadmap_data.get("milestones", [])):
-            title = ms_json.get("title")
-            db_match = db_milestones_map.get(title)
-            
-            if db_match:
-                # Merge by title match
-                ms_json["id"] = str(db_match.id)
-                ms_json["status"] = db_match.status
-                reconciled_milestones.append(ms_json)
-                logger.info(f"Matched milestone '{title}' by title, assigned ID {db_match.id}")
-            elif i < len(sorted_db_milestones):
-                # Fallback: match by index if title match fails
-                db_match = sorted_db_milestones[i]
-                logger.warning(f"Milestone '{title}' matched by index {i} instead of title for roadmap {roadmap.id}, assigned ID {db_match.id}")
-                ms_json["id"] = str(db_match.id)
-                ms_json["status"] = db_match.status
-                reconciled_milestones.append(ms_json)
-            else:
-                # Milestone in JSON but not in DB? Should not happen if sync is correct.
-                # Try to assign a fallback ID from any remaining DB milestone
-                logger.warning(f"Milestone '{title}' at index {i} found in JSON but not in DB for roadmap {roadmap.id}")
-                # Last resort: use the last DB milestone if available
-                if sorted_db_milestones:
-                    db_match = sorted_db_milestones[-1]
+        # If JSON has no milestones but DB has them, reconstruct from DB
+        if not json_milestones and milestones:
+            logger.warning(f"No milestones in JSON content, reconstructing from DB...")
+            for db_m in sorted_db_milestones:
+                info = db_m.info or {}
+                reconciled_milestones.append({
+                    "id": str(db_m.id),
+                    "title": db_m.title,
+                    "description": db_m.description,
+                    "status": db_m.status,
+                    "projects": info.get("projects", []),
+                    "skills": info.get("skills", []),
+                    "semester": info.get("semester", "")
+                })
+        else:
+            for i, ms_json in enumerate(json_milestones):
+                title = ms_json.get("title")
+                db_match = db_milestones_map.get(title)
+                
+                if db_match:
+                    # Merge by title match
                     ms_json["id"] = str(db_match.id)
                     ms_json["status"] = db_match.status
-                reconciled_milestones.append(ms_json)
+                    reconciled_milestones.append(ms_json)
+                    logger.info(f"Matched milestone '{title}' by title, assigned ID {db_match.id}")
+                elif i < len(sorted_db_milestones):
+                    # Fallback: match by index if title match fails
+                    db_match = sorted_db_milestones[i]
+                    logger.warning(f"Milestone '{title}' matched by index {i} instead of title for roadmap {roadmap.id}, assigned ID {db_match.id}")
+                    ms_json["id"] = str(db_match.id)
+                    ms_json["status"] = db_match.status
+                    reconciled_milestones.append(ms_json)
+                else:
+                    # Milestone in JSON but not in DB? Should not happen if sync is correct.
+                    # Try to assign a fallback ID from any remaining DB milestone
+                    logger.warning(f"Milestone '{title}' at index {i} found in JSON but not in DB for roadmap {roadmap.id}")
+                    # Last resort: use the last DB milestone if available
+                    if sorted_db_milestones:
+                        db_match = sorted_db_milestones[-1]
+                        ms_json["id"] = str(db_match.id)
+                        ms_json["status"] = db_match.status
+                    reconciled_milestones.append(ms_json)
     else:
-        # No DB milestones found
+        # No DB milestones found - this is the critical case!
+        # Auto-repair: create milestones in DB from JSON content
         logger.error(f"No milestones found in DB for roadmap {roadmap.id}, checking if JSON has milestones...")
-        json_milestones = roadmap_data.get("milestones", [])
         if json_milestones:
             logger.error(f"Found {len(json_milestones)} JSON milestones but 0 DB milestones for roadmap {roadmap.id}")
-        reconciled_milestones = json_milestones
+            logger.info("Auto-repairing: Creating milestones in DB from JSON content...")
+            
+            try:
+                # Create milestones in DB from JSON
+                for ms in json_milestones:
+                    milestone = RoadmapMilestone(
+                        roadmap_id=roadmap.id,
+                        title=ms.get("title"),
+                        description=ms.get("description"),
+                        status=MilestoneStatus.PENDING,
+                        info={
+                            "projects": ms.get("projects", []),
+                            "skills": ms.get("skills", []),
+                            "semester": ms.get("semester", "")
+                        }
+                    )
+                    db.add(milestone)
+                
+                await db.flush()
+                
+                # Fetch newly created milestones
+                new_milestones_result = await db.execute(
+                    select(RoadmapMilestone).where(RoadmapMilestone.roadmap_id == roadmap.id).order_by(RoadmapMilestone.id)
+                )
+                new_milestones = new_milestones_result.scalars().all()
+                
+                # Assign IDs to JSON milestones
+                for i, (ms, db_m) in enumerate(zip(json_milestones, new_milestones)):
+                    ms["id"] = str(db_m.id)
+                    ms["status"] = db_m.status
+                    reconciled_milestones.append(ms)
+                    logger.info(f"Auto-repair: Created milestone '{ms.get('title')}' with ID {db_m.id}")
+                
+                # Update roadmap content with new IDs
+                import copy
+                updated_content = copy.deepcopy(roadmap_data)
+                updated_content["milestones"] = reconciled_milestones
+                roadmap.content = updated_content
+                await db.commit()
+                logger.info(f"Auto-repair complete: Created {len(new_milestones)} milestones for roadmap {roadmap.id}")
+                
+            except Exception as e:
+                logger.error(f"Auto-repair failed: {e}")
+                await db.rollback()
+                reconciled_milestones = json_milestones
+        else:
+            reconciled_milestones = json_milestones
         
     roadmap_data["milestones"] = reconciled_milestones
     
