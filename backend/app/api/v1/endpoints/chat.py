@@ -34,11 +34,28 @@ async def chat(request: ChatRequest, db: AsyncSession = Depends(get_db), current
         result = await query_vector_db(request.query, db, current_user.id)
         print(f"LLM Response: {result}")
         
+        # Normalize the reply - LangChain may return various formats
+        reply = result.get("reply")
+        
+        # Handle array of message parts: [{"type": "text", "text": "...", "extras": {...}}]
+        if isinstance(reply, list):
+            text_parts = []
+            for part in reply:
+                if isinstance(part, dict) and "text" in part:
+                    text_parts.append(part["text"])
+                elif isinstance(part, str):
+                    text_parts.append(part)
+            reply = " ".join(text_parts)
+        # Handle single object with text property
+        elif isinstance(reply, dict):
+            reply = reply.get("text") or reply.get("content") or str(reply)
+        
         return {
-            "response": result.get("reply"),
+            "response": reply,
             "context": result.get("context", [])
         }
     except Exception as e:
         print(f"CRITICAL ERROR in /chat: {e}")
         from fastapi.responses import JSONResponse
         return JSONResponse(status_code=500, content={"detail": str(e)})
+
