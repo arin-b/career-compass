@@ -36,7 +36,8 @@ async def generate_roadmap(request: GenerateRoadmapRequest, db: AsyncSession = D
     if not profile:
         raise HTTPException(status_code=400, detail="Profile not found. Please complete your profile first.")
 
-    logger.info(f"Profile data: manual_gpa={profile.manual_gpa}, manual_major={profile.manual_major}, hobbies={profile.hobbies}, extracurriculars={profile.extracurriculars}, bio={profile.bio}, additional_context={profile.additional_context}, transcript_summary={profile.transcript_summary[:100]}...")
+    transcript_preview = profile.transcript_summary[:100] if profile.transcript_summary else "None"
+    logger.info(f"Profile data: manual_gpa={profile.manual_gpa}, manual_major={profile.manual_major}, hobbies={profile.hobbies}, extracurriculars={profile.extracurriculars}, bio={profile.bio}, additional_context={profile.additional_context}, transcript_summary={transcript_preview}...")
 
     manual_data = {
         "manual_gpa": profile.manual_gpa,
