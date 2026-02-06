@@ -92,54 +92,61 @@ async def process_transcript(user_id: UUID, file: UploadFile, db: AsyncSession, 
     db.add(profile)
     await db.commit()
 
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1000,
-        chunk_overlap=200,
-        length_function=len,
-    )
-    chunks = text_splitter.split_text(text)
-
-    embeddings_model = get_embeddings_model()
-    vectors = embeddings_model.embed_documents(chunks)
-
-    for chunk, vector in zip(chunks, vectors):
-        db_item = VectorStore(
-            content=chunk,
-            embedding=vector,
-            metadata_={"source": file.filename, "type": "transcript", "user_id": str(user_id)}
-        )
-        db.add(db_item)
-
-    await db.commit()
-    return {"message": f"Processed {len(chunks)} chunks from {file.filename}", "transcript_length": len(text)}
+    # VECTOR SEARCH DISABLED - Commented out for now
+    # text_splitter = RecursiveCharacterTextSplitter(
+    #     chunk_size=1000,
+    #     chunk_overlap=200,
+    #     length_function=len,
+    # )
+    # chunks = text_splitter.split_text(text)
+    #
+    # embeddings_model = get_embeddings_model()
+    # vectors = embeddings_model.embed_documents(chunks)
+    #
+    # for chunk, vector in zip(chunks, vectors):
+    #     db_item = VectorStore(
+    #         content=chunk,
+    #         embedding=vector,
+    #         metadata_={"source": file.filename, "type": "transcript", "user_id": str(user_id)}
+    #     )
+    #     db.add(db_item)
+    #
+    # await db.commit()
+    
+    return {"message": f"Processed transcript from {file.filename}", "transcript_length": len(text)}
 
 async def query_vector_db(query: str, db: AsyncSession, limit: int = 3):
     """
+    VECTOR SEARCH DISABLED - Using LLM directly without vector context.
+    
+    Previously:
     1. Embeds query.
     2. Searches VectorDB.
     3. Calls LLM with context.
+    
+    Now: Just calls LLM with the query.
     """
-    embeddings_model = get_embeddings_model()
-    query_vector = embeddings_model.embed_query(query)
-
-    stmt = select(VectorStore).order_by(
-        VectorStore.embedding.l2_distance(query_vector)
-    ).limit(limit)
-
-    result = await db.execute(stmt)
-    matches = result.scalars().all()
-
-    context_str = "\n\n".join([m.content for m in matches])
-    sources = [m.metadata_ for m in matches]
+    # VECTOR SEARCH DISABLED - Commented out for now
+    # embeddings_model = get_embeddings_model()
+    # query_vector = embeddings_model.embed_query(query)
+    #
+    # stmt = select(VectorStore).order_by(
+    #     VectorStore.embedding.l2_distance(query_vector)
+    # ).limit(limit)
+    #
+    # result = await db.execute(stmt)
+    # matches = result.scalars().all()
+    #
+    # context_str = "\n\n".join([m.content for m in matches])
+    # sources = [m.metadata_ for m in matches]
 
     llm = get_llm()
 
     system_prompt = """You are an expert Student Career Counselor AI. 
-    Use the provided context (student transcripts, career info) to answer variables.
-    If the context doesn't have enough info, say so, but try to be helpful based on general knowledge.
+    Answer questions helpfully based on general knowledge.
     """
 
-    user_prompt = f"Context:\n{context_str}\n\nQuestion: {query}"
+    user_prompt = f"Question: {query}"
 
     response = llm.invoke([
         SystemMessage(content=system_prompt),
@@ -148,5 +155,5 @@ async def query_vector_db(query: str, db: AsyncSession, limit: int = 3):
 
     return {
         "reply": response.content,
-        "context": [{"content": m.content, "metadata": m.metadata_} for m in matches]
+        # "context": [{"content": m.content, "metadata": m.metadata_} for m in matches]  # VECTOR SEARCH DISABLED
     }
