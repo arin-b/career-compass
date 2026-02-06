@@ -11,24 +11,19 @@ import io
 from langchain_core.messages import HumanMessage, SystemMessage
 
 def get_embeddings_model():
-    if not GOOGLE_API_KEY:
+    if not os.getenv("GOOGLE_API_KEY"):
         raise ValueError("GOOGLE_API_KEY not found in environment")
-    return GoogleGenerativeAIEmbeddings(model="models/text-embedding-004", google_api_key=GOOGLE_API_KEY, task_type="retrieval_document")
+    return GoogleGenerativeAIEmbeddings(model="models/embedding-001", google_api_key=os.getenv("GOOGLE_API_KEY"))
 
 def get_llm():
-    if not GOOGLE_API_KEY:
+    if not os.getenv("GOOGLE_API_KEY"):
         raise ValueError("GOOGLE_API_KEY not found in environment")
-    return ChatGoogleGenerativeAI(model="gemini-flash-latest", google_api_key=GOOGLE_API_KEY)
+    return ChatGoogleGenerativeAI(model="gemini-1.5-flash", google_api_key=os.getenv("GOOGLE_API_KEY"))
 
 import pdfplumber
 from app.models.models import VectorStore, Profile
 from sqlalchemy import update
 from uuid import UUID
-
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
-
-if not GOOGLE_API_KEY:
-    print("CRITICAL WARNING: GOOGLE_API_KEY is missing from environment variables! AI features will fail.")
 
 async def process_transcript(user_id: UUID, file: UploadFile, db: AsyncSession, mode: str = "replace"):
     """
