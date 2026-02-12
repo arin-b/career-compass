@@ -46,9 +46,10 @@ export const fetchClient = async (endpoint: string, options: FetchOptions = {}) 
 
     if (response.status === 401) {
         console.error("Unauthorized! Redirecting to login...");
-        // Clear cookie on 401
+        // Clear cookies on 401
         if (typeof document !== "undefined") {
             document.cookie = "token=; path=/; max-age=0";
+            document.cookie = "role=; path=/; max-age=0";
         }
         if (typeof window !== "undefined") {
             window.location.href = "/login";

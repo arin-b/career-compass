@@ -56,11 +56,15 @@ async def delete_user(
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
         
-    # Delete user (Cascades should handle related data if configured, but explicit deletes might be safer if not)
-    # Assuming CASCADE on ForeignKeys for roadmaps, profiles, etc.
-    # Based on models.py, we don't see explicit CASCADE DELETE on relationships, 
-    # but SQLAlchemy defaults usually require configuration. 
-    # Let's delete the user and let the DB handle constraints or errors if any.
-    
-    await db.delete(user)
-    await db.commit()
+    # Delete the user with all related data (roadmaps, profile, chat sessions)
+    # This will cascade delete thanks to the cascade configuration in models
+    try:
+        stmt = delete(User).where(User.id == user_id)
+        await db.execute(stmt)
+        await db.commit()
+    except Exception as e:
+        await db.rollback()
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to delete user: {str(e)}"
+        )

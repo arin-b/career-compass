@@ -203,12 +203,29 @@ const RoadmapTimeline = () => {
     };
 
     useEffect(() => {
+        // Check if user is admin — redirect them to admin dashboard
+        const checkRole = async () => {
+            try {
+                const profileRes = await fetchClient("/users/profile");
+                if (profileRes.ok) {
+                    const profileData = await profileRes.json();
+                    if (profileData.role === "admin") {
+                        router.push("/admin/dashboard");
+                        return;
+                    }
+                }
+            } catch (error) {
+                console.error("Role check failed", error);
+            }
+        };
+        checkRole();
         fetchLatestRoadmap();
         fetchRoadmapHistory();
     }, []);
 
     const handleLogout = () => {
         document.cookie = "token=; path=/; max-age=0";
+        document.cookie = "role=; path=/; max-age=0";
 
         toast.success("Logged out successfully.");
         router.push("/login");

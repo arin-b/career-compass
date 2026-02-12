@@ -86,6 +86,13 @@ export default function ProfilePage() {
                 const res = await fetchClient("/users/profile");
                 if (res.ok) {
                     const data = await res.json();
+
+                    // Redirect admin users away from profile page
+                    if (data.role === "admin") {
+                        router.push("/admin/dashboard");
+                        return;
+                    }
+
                     setFormData({
                         manual_major: data.manual_major || "",
                         manual_gpa: data.manual_gpa ? data.manual_gpa.toString() : "",

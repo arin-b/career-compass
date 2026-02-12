@@ -41,9 +41,9 @@ class User(Base):
     avatar_base64 = Column(Text, nullable=True) # Storing base64 string directly
     role = Column(String, default="user", nullable=False)
 
-    profile = relationship("Profile", back_populates="user", uselist=False)
-    roadmaps = relationship("Roadmap", back_populates="user")
-    chat_sessions = relationship("ChatSession", back_populates="user")
+    profile = relationship("Profile", back_populates="user", uselist=False, cascade="all, delete-orphan")
+    roadmaps = relationship("Roadmap", back_populates="user", cascade="all, delete-orphan")
+    chat_sessions = relationship("ChatSession", back_populates="user", cascade="all, delete-orphan")
 
 class Profile(Base):
     __tablename__ = "profiles"
@@ -76,7 +76,7 @@ class Roadmap(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     user = relationship("User", back_populates="roadmaps")
-    milestones = relationship("RoadmapMilestone", back_populates="roadmap")
+    milestones = relationship("RoadmapMilestone", back_populates="roadmap", cascade="all, delete-orphan")
 
 class RoadmapMilestone(Base):
     __tablename__ = "roadmap_milestones"
@@ -99,7 +99,7 @@ class ChatSession(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     user = relationship("User", back_populates="chat_sessions")
-    messages = relationship("ChatMessage", back_populates="session")
+    messages = relationship("ChatMessage", back_populates="session", cascade="all, delete-orphan")
 
 class ChatMessage(Base):
     __tablename__ = "chat_messages"

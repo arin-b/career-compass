@@ -2,11 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Sidebar } from "@/components/Sidebar";
 import { fetchClient } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Trash2, Shield, User as UserIcon, Calendar, Mail } from "lucide-react";
+import { Trash2, Shield, User as UserIcon, Calendar, Mail, LogOut, Map } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
@@ -89,7 +88,14 @@ export default function AdminDashboard() {
         }
     };
 
-    if (!isAdmin) return null; // Or a loading spinner
+    const handleLogout = () => {
+        document.cookie = "token=; path=/; max-age=0";
+        document.cookie = "role=; path=/; max-age=0";
+        toast.success("Logged out successfully.");
+        router.push("/login");
+    };
+
+    if (!isAdmin) return null;
 
     if (loading) {
         return (
@@ -105,8 +111,29 @@ export default function AdminDashboard() {
 
     return (
         <div className="flex h-screen bg-black overflow-hidden font-sans text-white">
-            <Sidebar />
             <div className="flex-1 flex flex-col h-full overflow-hidden">
+                {/* Admin Header */}
+                <header className="border-b border-gray-800 bg-gray-900/80 backdrop-blur-md px-8 py-4 flex items-center justify-between shrink-0">
+                    <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-red-500 to-orange-500 p-[2px]">
+                            <div className="w-full h-full rounded-full bg-gray-900 flex items-center justify-center">
+                                <Map className="w-5 h-5 text-white" />
+                            </div>
+                        </div>
+                        <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-orange-500">
+                            CareerCompass Admin
+                        </span>
+                    </div>
+                    <Button
+                        variant="outline"
+                        onClick={handleLogout}
+                        className="border-red-700 text-red-400 hover:bg-red-900/20 gap-2"
+                    >
+                        <LogOut className="w-4 h-4" />
+                        Logout
+                    </Button>
+                </header>
+
                 <main className="flex-1 overflow-y-auto p-8">
                     <div className="max-w-6xl mx-auto space-y-6">
                         <div className="flex items-center justify-between">
@@ -127,75 +154,69 @@ export default function AdminDashboard() {
                                 <CardTitle className="text-white">Registered Users ({users.length})</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                {loading ? (
-                                    <div className="flex justify-center p-8">
-                                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-500"></div>
-                                    </div>
-                                ) : (
-                                    <div className="overflow-x-auto">
-                                        <table className="w-full text-left border-collapse">
-                                            <thead>
-                                                <tr className="border-b border-gray-800 text-gray-400 text-sm">
-                                                    <th className="p-4 font-medium">User</th>
-                                                    <th className="p-4 font-medium">Email</th>
-                                                    <th className="p-4 font-medium">Role</th>
-                                                    <th className="p-4 font-medium">Joined</th>
-                                                    <th className="p-4 font-medium text-right">Actions</th>
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-left border-collapse">
+                                        <thead>
+                                            <tr className="border-b border-gray-800 text-gray-400 text-sm">
+                                                <th className="p-4 font-medium">User</th>
+                                                <th className="p-4 font-medium">Email</th>
+                                                <th className="p-4 font-medium">Role</th>
+                                                <th className="p-4 font-medium">Joined</th>
+                                                <th className="p-4 font-medium text-right">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="text-sm">
+                                            {users.map((user) => (
+                                                <tr key={user.id} className="border-b border-gray-800 hover:bg-gray-800/50 transition-colors">
+                                                    <td className="p-4">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="w-8 h-8 rounded-full bg-gray-800 overflow-hidden flex items-center justify-center border border-gray-700">
+                                                                {user.avatar_base64 ? (
+                                                                    <img src={user.avatar_base64} alt="Avatar" className="w-full h-full object-cover" />
+                                                                ) : (
+                                                                    <UserIcon className="w-4 h-4 text-gray-500" />
+                                                                )}
+                                                            </div>
+                                                            <span className="font-medium text-gray-200">{user.display_name || user.full_name || "Unknown"}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td className="p-4 text-gray-400">
+                                                        <div className="flex items-center gap-2">
+                                                            <Mail className="w-3 h-3" />
+                                                            {user.email}
+                                                        </div>
+                                                    </td>
+                                                    <td className="p-4">
+                                                        <span className={`px-2 py-1 rounded-full text-xs font-bold ${user.role === 'admin'
+                                                            ? 'bg-red-500/20 text-red-400 border border-red-500/30'
+                                                            : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                                                            }`}>
+                                                            {user.role}
+                                                        </span>
+                                                    </td>
+                                                    <td className="p-4 text-gray-500">
+                                                        <div className="flex items-center gap-2">
+                                                            <Calendar className="w-3 h-3" />
+                                                            {user.created_at ? format(new Date(user.created_at), 'MMM d, yyyy') : 'N/A'}
+                                                        </div>
+                                                    </td>
+                                                    <td className="p-4 text-right">
+                                                        {user.role !== 'admin' && (
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                onClick={() => handleDelete(user.id, user.email)}
+                                                                className="text-gray-500 hover:text-red-400 hover:bg-red-500/10"
+                                                            >
+                                                                <Trash2 className="w-4 h-4" />
+                                                            </Button>
+                                                        )}
+                                                    </td>
                                                 </tr>
-                                            </thead>
-                                            <tbody className="text-sm">
-                                                {users.map((user) => (
-                                                    <tr key={user.id} className="border-b border-gray-800 hover:bg-gray-800/50 transition-colors">
-                                                        <td className="p-4">
-                                                            <div className="flex items-center gap-3">
-                                                                <div className="w-8 h-8 rounded-full bg-gray-800 overflow-hidden flex items-center justify-center border border-gray-700">
-                                                                    {user.avatar_base64 ? (
-                                                                        <img src={user.avatar_base64} alt="Avatar" className="w-full h-full object-cover" />
-                                                                    ) : (
-                                                                        <UserIcon className="w-4 h-4 text-gray-500" />
-                                                                    )}
-                                                                </div>
-                                                                <span className="font-medium text-gray-200">{user.display_name || user.full_name || "Unknown"}</span>
-                                                            </div>
-                                                        </td>
-                                                        <td className="p-4 text-gray-400">
-                                                            <div className="flex items-center gap-2">
-                                                                <Mail className="w-3 h-3" />
-                                                                {user.email}
-                                                            </div>
-                                                        </td>
-                                                        <td className="p-4">
-                                                            <span className={`px-2 py-1 rounded-full text-xs font-bold ${user.role === 'admin'
-                                                                    ? 'bg-red-500/20 text-red-400 border border-red-500/30'
-                                                                    : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-                                                                }`}>
-                                                                {user.role}
-                                                            </span>
-                                                        </td>
-                                                        <td className="p-4 text-gray-500">
-                                                            <div className="flex items-center gap-2">
-                                                                <Calendar className="w-3 h-3" />
-                                                                {user.created_at ? format(new Date(user.created_at), 'MMM d, yyyy') : 'N/A'}
-                                                            </div>
-                                                        </td>
-                                                        <td className="p-4 text-right">
-                                                            {user.role !== 'admin' && (
-                                                                <Button
-                                                                    variant="ghost"
-                                                                    size="icon"
-                                                                    onClick={() => handleDelete(user.id, user.email)}
-                                                                    className="text-gray-500 hover:text-red-400 hover:bg-red-500/10"
-                                                                >
-                                                                    <Trash2 className="w-4 h-4" />
-                                                                </Button>
-                                                            )}
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                )}
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
                             </CardContent>
                         </Card>
                     </div>

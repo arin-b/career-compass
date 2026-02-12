@@ -39,9 +39,15 @@ export default function LoginPage() {
             const data = await res.json()
 
             document.cookie = `token=${data.access_token}; path=/; max-age=1800` // 30 min
+            document.cookie = `role=${data.role || "user"}; path=/; max-age=1800` // 30 min
 
             toast.success("Welcome back!")
-            router.push("/dashboard")
+
+            if (data.role === "admin") {
+                router.push("/admin/dashboard")
+            } else {
+                router.push("/dashboard")
+            }
 
         } catch (error) {
             toast.error("Login failed. Check your credentials.")

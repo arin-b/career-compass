@@ -29,6 +29,7 @@ export const Sidebar = () => {
 
     const handleLogout = () => {
         document.cookie = "token=; path=/; max-age=0";
+        document.cookie = "role=; path=/; max-age=0";
         toast.success("Logged out successfully.");
         router.push("/login");
     };
