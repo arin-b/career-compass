@@ -13,8 +13,7 @@ import { motion } from "framer-motion"
 import { fetchClient } from "@/lib/api"
 
 import { Sidebar } from "@/components/Sidebar";
-import { ThemeSwitcher } from "@/components/ThemeSwitcher"
-import { DashboardIllustration } from "@/components/illustrations"
+import { ThemeToggle } from "@/components/ThemeToggle"
 
 import confetti from "canvas-confetti"
 interface TimelineItemProps {
@@ -410,7 +409,7 @@ ${steps.map((s: any) => `- ${s.title}: ${s.desc}`).join('\n')}
                     <p className="text-lg text-gray-600 dark:text-gray-400 mt-2">Generated based on your unique profile and interests</p>
                 </div>
                 <div className="flex gap-6">
-                    <ThemeSwitcher />
+                    <ThemeToggle />
                     <Button
                         onClick={() => handleGenerate(false)}
                         disabled={generating}

@@ -11,8 +11,7 @@ import { FileUpload } from "@/components/file-upload";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Save, Sparkles, User, GraduationCap, FileText, Plus, RefreshCw, X } from "lucide-react";
-import { ThemeSwitcher } from "@/components/ThemeSwitcher";
-import { ProfileIllustration } from "@/components/illustrations";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import {
     Dialog,
     DialogContent,
@@ -222,7 +221,7 @@ export default function ProfilePage() {
                             Your Profile
                         </h1>
                     </div>
-                    <ThemeSwitcher />
+                    <ThemeToggle />
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -231,7 +230,6 @@ export default function ProfilePage() {
 
                         {/* Avatar Card */}
                         <Card className="bg-white/80 dark:bg-gray-800/80 border-purple-200 dark:border-purple-800 shadow-xl backdrop-blur-sm flex flex-col items-center p-8 text-center rounded-2xl min-h-[320px]">
-                            <ProfileIllustration />
                             <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-gradient-to-r from-purple-500 to-blue-500 mb-6 bg-gradient-to-br from-purple-100 to-blue-100 dark:from-gray-700 dark:to-gray-600 items-center justify-center flex shadow-lg">
                                 {formData.avatar_base64 ? (
                                     <img src={formData.avatar_base64} alt="Avatar" className="w-full h-full object-cover" />

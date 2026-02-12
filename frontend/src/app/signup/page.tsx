@@ -9,8 +9,6 @@ import { Map, Sparkles, Lock, Mail, User, GraduationCap } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ThemeSwitcher } from "@/components/ThemeSwitcher"
-import { SignupIllustration } from "@/components/illustrations"
 
 export default function SignupPage() {
     const router = useRouter()
@@ -54,14 +52,9 @@ export default function SignupPage() {
             <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(circle_at_50%_0%,rgba(236,72,153,0.1),transparent_50%)]"></div>
             <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-900/10 rounded-full blur-3xl"></div>
 
-            {/* Theme Switcher */}
-            <div className="absolute top-6 right-6 z-20">
-                <ThemeSwitcher />
-            </div>
 
             <Card className="w-full max-w-md bg-gray-900/50 border-gray-800 backdrop-blur-xl shadow-2xl relative z-10">
                 <CardHeader className="text-center space-y-2">
-                    <SignupIllustration />
                     <div className="mx-auto w-12 h-12 rounded-full bg-gradient-to-tr from-purple-500 to-pink-500 p-[2px] mb-2">
                         <div className="w-full h-full rounded-full bg-gray-900 flex items-center justify-center">
                             <Map className="w-6 h-6 text-white" />
