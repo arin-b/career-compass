@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, delete
+from sqlalchemy import select
 from typing import List, Any
 import uuid
 
@@ -57,10 +57,9 @@ async def delete_user(
         raise HTTPException(status_code=404, detail="User not found")
         
     # Delete the user with all related data (roadmaps, profile, chat sessions)
-    # This will cascade delete thanks to the cascade configuration in models
+    # Must use session.delete() for ORM cascade="all, delete-orphan" to work
     try:
-        stmt = delete(User).where(User.id == user_id)
-        await db.execute(stmt)
+        await db.delete(user)
         await db.commit()
     except Exception as e:
         await db.rollback()
