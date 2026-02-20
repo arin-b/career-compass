@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { fetchClient } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Trash2, Shield, User as UserIcon, Calendar, Mail, LogOut, Map } from "lucide-react";
+import { Trash2, Shield, User as UserIcon, Calendar, Mail, LogOut, Map, Eye } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
@@ -177,7 +178,12 @@ export default function AdminDashboard() {
                                                                     <UserIcon className="w-4 h-4 text-gray-500" />
                                                                 )}
                                                             </div>
-                                                            <span className="font-medium text-gray-200">{user.display_name || user.full_name || "Unknown"}</span>
+                                                            <Link
+                                                                href={`/admin/users/${user.id}`}
+                                                                className="font-medium text-gray-200 hover:text-orange-400 hover:underline transition-colors"
+                                                            >
+                                                                {user.display_name || user.full_name || "Unknown"}
+                                                            </Link>
                                                         </div>
                                                     </td>
                                                     <td className="p-4 text-gray-400">
@@ -201,16 +207,27 @@ export default function AdminDashboard() {
                                                         </div>
                                                     </td>
                                                     <td className="p-4 text-right">
-                                                        {user.role !== 'admin' && (
-                                                            <Button
-                                                                variant="ghost"
-                                                                size="icon"
-                                                                onClick={() => handleDelete(user.id, user.email)}
-                                                                className="text-gray-500 hover:text-red-400 hover:bg-red-500/10"
-                                                            >
-                                                                <Trash2 className="w-4 h-4" />
-                                                            </Button>
-                                                        )}
+                                                        <div className="flex items-center justify-end gap-1">
+                                                            <Link href={`/admin/users/${user.id}`}>
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    className="text-gray-500 hover:text-orange-400 hover:bg-orange-500/10"
+                                                                >
+                                                                    <Eye className="w-4 h-4" />
+                                                                </Button>
+                                                            </Link>
+                                                            {user.role !== 'admin' && (
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    onClick={() => handleDelete(user.id, user.email)}
+                                                                    className="text-gray-500 hover:text-red-400 hover:bg-red-500/10"
+                                                                >
+                                                                    <Trash2 className="w-4 h-4" />
+                                                                </Button>
+                                                            )}
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             ))}
