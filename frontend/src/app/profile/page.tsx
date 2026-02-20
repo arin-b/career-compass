@@ -218,7 +218,7 @@ export default function ProfilePage() {
                             <ArrowLeft className="w-5 h-5 mr-2" /> Back to Dashboard
                         </Button>
                         <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-blue-600 to-green-600 dark:from-purple-400 dark:via-blue-400 dark:to-green-400">
-                            Your Profile
+                            User Profile
                         </h1>
                     </div>
                     <ThemeToggle />

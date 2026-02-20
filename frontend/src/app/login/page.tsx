@@ -68,7 +68,7 @@ export default function LoginPage() {
                             <Map className="w-6 h-6 text-white" />
                         </div>
                     </div>
-                    <CardTitle className="text-2xl font-bold text-white">CareerCompass</CardTitle>
+                    <CardTitle className="text-2xl font-bold text-white">User Login</CardTitle>
                     <CardDescription className="text-gray-400">Enter the future of career planning</CardDescription>
                 </CardHeader>
                 <CardContent>
