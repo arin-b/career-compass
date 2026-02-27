@@ -298,8 +298,6 @@ ${steps.map((s: any) => `- ${s.title}: ${s.desc}`).join('\n')}
                 </div>
             </div>
 
-            <ProgressBar completed={completedCount} total={steps.length} />
-
             <div className="flex-1 overflow-y-auto pr-6">
                 <RoadmapDisplay
                     milestones={steps}
